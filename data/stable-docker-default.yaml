@@ -1,0 +1,8 @@
+parameters:
+  role:               stable-docker
+  flavor_name:        A1.1
+  image_name:         Ubuntu 16.04 LTS (Xenial Xerus)
+  network_wan:        inap-18000-WAN1110
+  network_lan:        inap-18000-LAN2011
+  keypair_name:       MacBookPro
+  node_count:         1

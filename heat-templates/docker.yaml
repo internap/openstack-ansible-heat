@@ -30,8 +30,14 @@ parameters:
     constraints:
       - custom_constraint: neutron.network
         description: Must identify an network known to Neutron
-#      - allowed_pattern: "/WAN/"
-#        description: must be a WAN network
+
+  network_lan:
+    type: string
+    label: (LAN) Private network
+    description: Name or ID of the internal network to use (should have 'LAN' in his name)
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must identify an network known to Neutron
   keypair_name:
     type: string
     label: Controller Keypair
@@ -44,6 +50,12 @@ parameters:
     type: number
     label: Number of instance
     description: Total number of instance to use, balanced out between controller and nodes
+
+  role:
+    type:     string
+    label:    role to execute
+    default:  docker
+    hidden:   true
 
 resources:
   wait_condition:
@@ -62,41 +74,38 @@ resources:
       group: script
       config:
         str_replace:
-          template: { get_file: scripts/install-ansible.sh }
+          template: { get_file: ../scripts/install-ansible.sh }
           params:
             $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
 
-  # pull_role_config:
-  #   type: OS::Heat::SoftwareConfig
-  #   properties:
-  #     group: script
-  #     config: str_replace:
-  #       template: |
-  #         #!/bin/bash
-  #         cd /tmp
-  #         git clone ROLEREPO
-  #         cp -r ROLENAME/roles /etc/ansible/roles
-  #       params:
-  #         REPO: "https://github.com/internap/ansible+heat-templates/"
-  #         ROLENAME: rancher
-
-  running_ansibleplaybook:
+  install_ansible_roles:
     type: OS::Heat::SoftwareConfig
     properties:
       group: script
       config:
         str_replace:
-          template: { get_file: scripts/running-playbook.sh }
+          template: { get_file: ../scripts/install-ansible-roles.sh }
           params:
             $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
-            $PLAYBOOK_NAME: docker-ansible
+
+  running_ansible_playbook:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template: { get_file: ../scripts/running-playbook.sh }
+          params:
+            $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
+            $ROLE: docker
 
   controller_serverconfig:
     type: OS::Heat::MultipartMime
     properties:
       parts:
       - config: { get_resource: install_ansible }
-      - config: { get_resource: running_ansibleplaybook }
+      - config: { get_resource: install_ansible_roles }
+      - config: { get_resource: running_ansible_playbook }
 
   #doesn't work for us (Internap)
   # deploy_controller:
@@ -117,12 +126,6 @@ resources:
         - network:  { get_param: network_wan }
       user_data_format: RAW
       user_data:    { get_resource: controller_serverconfig }
-      personality:
-        "/etc/ansible/docker-ansible.yaml":             { get_file: docker-ansible.yaml }
-        "/etc/ansible/data/docker-default.yaml":        { get_file: data/docker-default.yaml }
-        "/etc/ansible/roles/instance/tasks/main.yaml":  { get_file: roles/instance/tasks/main.yaml }
-        "/etc/ansible/roles/docker/tasks/main.yaml":    { get_file: roles/docker/tasks/main.yaml }
-        "/etc/ansible/roles/docker/handlers/main.yaml": { get_file: roles/docker/handlers/main.yaml }
 
 outputs:
   name:
