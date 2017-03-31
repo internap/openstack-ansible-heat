@@ -1,7 +1,7 @@
 # openstack-ansible-heat
 An ansible AND heat template repository to manage different workload on internap public cloud
 
-You have to pass parameters using -e <PARAM1>=<VALUE1> -e <PARAMS2>=<VALUE2> for Ansible
+You have to pass parameters using -e "<PARAM1>=<VALUE1>" -e "<PARAMS2>=<VALUE2>" for Ansible
 and directly on the command line for Heat
 
 Mandatory parameters:
