@@ -1,0 +1,132 @@
+#!/usr/bin/env openstack stack create -e data/rancher-default.yaml -t rancher-heat.yaml --os-cloud=<YOURCLOUD.YAMLCONFIGNAMEHERE>
+heat_template_version: 2013-05-23
+description: A rancher controller and 2 node setup
+
+
+parameters:
+  controller_flavor:
+    type: string
+    label: Controller Instance flavor
+    description: Flavor for the rancher controller
+    constraints:
+      - custom_constraint: nova.flavor
+        description: Must be a flavor known to Nova
+
+  host_flavor:
+    type: string
+    label: Rancher host Instance flavor
+    description: Flavor for the rancher host nodes
+    constraints:
+      - custom_constraint: nova.flavor
+        description: Must be a flavor known to Nova
+
+  image:
+    type: string
+    label: OS image name
+    description: Name or ID of the image to use for all the instances (controller and node).
+    constraints:
+      - custom_constraint: glance.image
+        description: Must identify an image known to Glance
+
+  network_wan:
+    type: string
+    label: (WAN) Public facing network
+    description: Name or ID of the internet facing network to use (should have 'WAN' in his name)
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must identify an network known to Neutron
+#      - allowed_pattern: "/WAN/"
+#        description: must be a WAN network
+  keypair_name:
+    type: string
+    label: Controller Keypair
+    description: SSH Keypair to use for the rancher controller
+    constraints:
+      - custom_constraint: nova.keypair
+        description: Must be a keypair known to Nova
+
+  node_count:
+    type: number
+    label: Number of instance
+    description: Total number of instance to use, balanced out between controller and nodes
+
+resources:
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: { get_resource: wait_handle }
+      count: 2
+      timeout: 300
+
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  install_ansible:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template: { get_file: scripts/install-ansible.sh }
+          params:
+            $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
+
+  # pull_role_config:
+  #   type: OS::Heat::SoftwareConfig
+  #   properties:
+  #     group: script
+  #     config: str_replace:
+  #       template: |
+  #         #!/bin/bash
+  #         cd /tmp
+  #         git clone ROLEREPO
+  #         cp -r ROLENAME/roles /etc/ansible/roles
+  #       params:
+  #         REPO: "https://github.com/internap/ansible+heat-templates/"
+  #         ROLENAME: rancher
+
+  running_ansibleplaybook:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template: { get_file: scripts/running-playbook.sh }
+          params:
+            $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
+            $PLAYBOOK_NAME: rancher
+
+  controller_serverconfig:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: install_ansible }
+      - config: { get_resource: running_ansibleplaybook }
+
+  controller_server:
+    type: OS::Nova::Server
+    properties:
+      image:        { get_param: image }
+      flavor:       { get_param: controller_flavor }
+      key_name:     { get_param: keypair_name }
+      networks:
+        - network:  { get_param: network_wan }
+      user_data_format: RAW
+      user_data:    { get_resource: controller_serverconfig }
+      personality:
+        "/etc/ansible/roles/rancher-local.yaml":        { get_file: roles/rancher-local.yaml }
+        "/etc/ansible/roles/docker/tasks/main.yaml":    { get_file: roles/docker/tasks/main.yaml }
+        "/etc/ansible/roles/docker/handlers/main.yaml": { get_file: roles/docker/handlers/main.yaml }
+        "/etc/ansible/roles/rancher/meta/main.yaml":    { get_file: roles/rancher/meta/main.yaml }
+        "/etc/ansible/roles/rancher/tasks/main.yaml":   { get_file: roles/rancher/tasks/main.yaml }
+
+outputs:
+  name:
+    description: Name of the rancher controller.
+    value: { get_attr: [controller_server, name] }
+  # curl_for_wait:
+  #   description: curl_for_wait
+  #   value: { get_attr: ['wait_handle', 'curl_cli'] }ç
+  # cluster_key:
+  #   description: Generated ssh key for cluster
+  #   value: { get_attr: [rancher-clusterkey, show]}

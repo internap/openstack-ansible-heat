@@ -1,0 +1,25 @@
+---
+# Playbook to manage OpenStack inventory
+
+- name: gathering OpenStack instance facts
+  connection:         local
+  os_server_facts:
+    cloud:            "{{ os_cloud_name }}"
+    server:           "{{ os_instancename_prefix }}*"
+  register:           gathered_os_instance_list
+
+- name: refresh inventory after OpenStack inventory gathering
+  meta: refresh_inventory
+
+- name: adding existing OpenStack instance to its groups
+  add_host:
+    name:             "{{ item.id }}"
+    groups:           "{{ item.metadata.groups }}"
+    instance_name:    "{{ item.name }}"
+    os_uuid:          "{{ item.id }}"
+    os_key_name:      "{{ item.metadata.key_name }}"
+    os_instance_tags: "{{ item.metadata.tags }}"
+    publicIPv4:       "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    privateIPv4:      "{{ ( item.networks[ os_cloud_privatenetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    os_instancename_prefix: ''
+  with_items:         "{{ gathered_os_instance_list.ansible_facts.openstack_servers }}"

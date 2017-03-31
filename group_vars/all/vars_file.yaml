@@ -1,0 +1,25 @@
+action:                         "maintain"
+
+#node counting and balancing
+node_number:                    "{{ node_count          | default( ( parameters is defined and parameters.node_count is defined )           | ternary( parameters.node_count,           1 ) ) }}"
+public_node_number:             "{{ public_node_count   | default( ( parameters is defined and parameters.public_node_count is defined )    | ternary( parameters.public_node_count,    1 ) ) }}"
+private_node_number:            "{{ ( parameters is defined and parameters.private_node_number is defined )                                 | ternary( parameters.private_node_number, ( node_number | int ) - ( public_node_number | int ) ) }}"
+
+
+#OpenStack ssg key name defaulting
+os_cloud_name:                  "{{ os_cloud }}"
+os_instancename_prefix:         "{{ instancename_prefix | default( ( parameters is defined and parameters.instancename_prefix is defined )  | ternary( parameters.instancename_prefix,  playbook_name + '-playbook' ) ) }}"
+os_key_name:                    "{{ key_filename        | default( playbook_name + '-key' ) }}"
+os_instance_tags:               "{{ server_tags         | default( ( parameters is defined and parameters.server_tags is defined )          | ternary( parameters.server_tags,  playbook_name ) ) }}"
+os_cloud_privatenetwork_name:   "{{ network_lan         | default( ( parameters is defined and parameters.network_lan is defined )          | ternary( parameters.network_lan,          '' ) ) }}"
+os_cloud_publicnetwork_name:    "{{ network_wan         | default( ( parameters is defined and parameters.network_wan is defined )          | ternary( parameters.network_wan,          '' ) ) }}"
+
+#keypair defaulting
+computed_ssh_key_path:          "{{ ( '~' | expanduser ) + '/.ssh/' }}"
+ansible_user:                   root
+ansible_ssh_user:               root
+ansible_ssh_private_key_file:   "{{ computed_ssh_key_path + os_key_name }}"
+
+
+#squid defaults (have to be global to be shared accross all meta-roles)
+proxy_http_port:                3128

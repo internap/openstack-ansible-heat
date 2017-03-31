@@ -1,0 +1,59 @@
+---
+# Playbook to cleanup OpenStack instance and resource (if specififed)
+- name: confirm
+  pause: prompt="\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n\nThis action is destructive, it will remove ALL current '{{ playbook_name }}' tagged instances !\n--Press return if you're absolutely sure. Otherwise, press Ctrl+c and then 'a' to abort--"
+  when:           not 'local' in action and 'delete' in action
+
+- name: delete OpenStack instances
+  os_server:
+    cloud:        "{{ os_cloud_name }}"
+    state:        absent
+    name:         "{{ item }}"
+  with_items:     "{{ groups[ playbook_name ] }}"
+  when:           not 'local' in action and 'delete' in action and groups[ playbook_name ] is defined
+
+- name: refresh inventory after delete
+  meta: refresh_inventory
+
+- name: checking if bastion config exists
+  stat:
+    path:         "./data/config/{{ playbook_name }}-ssh_config"
+  register:       bastionconfig_exist
+  when:           not 'local' in action and 'delete' in action
+
+- name: delete bastion config
+  file:
+      path:       "./data/config/{{ playbook_name }}-ssh_config"
+      state:      absent
+  when:           not 'local' in action and 'delete' in action and bastionconfig_exist.stat.exists == True
+
+- name: delete existing SSH keys in OpenStack
+  os_keypair:
+      cloud:      "{{ os_cloud_name }}"
+      state:      absent
+      name:       "{{ os_key_name }}"
+  when:           '"delete_all" in action'
+
+- name: checking if SSH key exists
+  stat:
+    path:         "{{ ansible_ssh_private_key_file }}"
+  register:       sshkey_exist
+  when:           not 'local' in action
+
+- name: delete private SSH keys locally
+  file:
+    path:         "{{ ansible_ssh_private_key_file }}"
+    state:        absent
+  when:           action == "delete_all_includinguserkey" and sshkey_exist.stat.exists == True
+
+- name: checking if public SSH key exists
+  stat:
+    path:         "{{ ansible_ssh_private_key_file }}.pub"
+  register:       sshpubkey_exist
+  when:           not 'local' in action
+
+- name: delete public SSH keys locally
+  file:
+    path:         "{{ ansible_ssh_private_key_file }}.pub"
+    state:        absent
+  when:           action == "delete_all_includinguserkey" and sshpubkey_exist.stat.exists == True
