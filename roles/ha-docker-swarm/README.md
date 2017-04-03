@@ -26,11 +26,11 @@ the internet unless you go through the ssh bastion server.
 ### Creating/adding 4 nodes to the Swarm:
 * using Ansible:
   ```bash
-  ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=docker-swarm -e node_count=4
+  ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=ha-docker-swarm -e node_count=4
   ```
 * using Heat:
   ```bash
-  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=docker-swarm --node_count=4
+  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=ha-docker-swarm --node_count=4
   ```
 
 # Contributing
