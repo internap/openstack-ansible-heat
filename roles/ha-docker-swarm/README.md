@@ -2,7 +2,7 @@
 
 See [the main documentation](/) for installation instruction and details.
 
-+ ![Progress](http://progressed.io/bar/100)   (Ubuntu) Docker Swarm installation and configuration
++ ![Progress](http://progressed.io/bar/0)     (Ubuntu) HA installation and config
 + ![Progress](http://progressed.io/bar/0)     (Ubuntu) Security hardening
 
 ## What does it do ?
