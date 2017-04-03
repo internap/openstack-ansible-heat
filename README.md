@@ -111,13 +111,13 @@ You can see the support details by clicking the workload name.
 
 ##### Which would mean, for a 4 node docker swarm cluster using a shared ssh key stored in /tmp/blabla:
 * using Ansible:
- ```bash
-./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME> -e node_count=4 -e key_filename=/tmp/blabla
-```
+  ```bash
+  ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME> -e node_count=4 -e key_filename=/tmp/blabla
+  ```
 * using Heat:
- ```bash
-./openstack-heat --os_cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node_count=4 --key_filename=/tmp/blabla
-```
+  ```bash
+  ./openstack-heat --os_cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node_count=4 --key_filename=/tmp/blabla
+  ```
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!
