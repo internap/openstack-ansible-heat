@@ -109,7 +109,7 @@ You can see the support details by clicking the workload name.
  - delete_all_includinguserkey: the script will wipe keys and instances both in OS and locally
 * key_filename= explicit SSH key file name to use
 
-Which would mean, for a 4 node docker swarm cluster using a shared ssh key stored in /tmp/blabla:
+##### Which would mean, for a 4 node docker swarm cluster using a shared ssh key stored in /tmp/blabla:
 * using Ansible:
  ```bash
 ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME> -e node_count=4 -e key_filename=/tmp/blabla
