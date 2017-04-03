@@ -3,16 +3,19 @@
 See [the main documentation](/) for installation instruction and details.
 
 + ![Progress](http://progressed.io/bar/100)   (Ubuntu) Docker Swarm installation and configuration
-+ ![Progress](http://progressed.io/bar/80)    (Ubuntu) Security hardnessing
++ ![Progress](http://progressed.io/bar/0)     (Ubuntu) Security hardening
 
 ## What does it do ?
-Adding to the basic workload features, this template/recipe add the installation
-and configuration of a Docker Swarm. All 'public' nodes will be elected as Leader
-in the swarm, all 'private' nodes will be 'slaves'.
+Adding to the docker-swarm workload features, this template/recipe add high
+availability. By default, unless you specify more using the public_node_count
+parameters, 2 publicly exposed instance will be elected as Swarm Manager. They
+will be load-balanced using keepalived on a shared OpenStack Neutron port.
+This Neutron port IP should then be used in your DNS entries.
 
 ### Private / public nodes split
 - If don't specify the public_node_count parameters during the deployment, we will
-automatically elect the first node as the one, publicly exposed, Leader of the Swarm
+automatically elect the first 2 nodes as the managers of the Swarm and the first
+one will be the Leader of the Swarm
 - We will use the remainder left after instantiating the number of public node
 specified in the public_node_count parameter as private nodes, not accessible to
 the internet unless you go through the ssh bastion server.

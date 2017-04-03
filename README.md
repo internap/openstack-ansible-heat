@@ -1,18 +1,18 @@
 ### An ansible AND heat template repository to manage different workload on an OpenStack certified public cloud
 
 
-It currently fully support the following workload
-
-+ ![Progress](http://progressed.io/bar/80)   [docker](/roles/docker) - A basic docker installation
-+ ![Progress](http://progressed.io/bar/80)   [docker-swarm](/roles/docker-swarm) - A swarm installation (using latest swarm version)
-+ ![Progress](http://progressed.io/bar/40)   [maas](/roles/maas)  - A basic Ubuntu MaaS installation for inventory management
-+ ![Progress](http://progressed.io/bar/20)   [rancher](/roles/rancher) - A rancher mode installation
-+ ![Progress](http://progressed.io/bar/100)  [stable-docker](/roles/stable-docker)  - The current stable version of docker installation
+It currently fully support the following workload:
++ ![Progress](http://progressed.io/bar/100)   [docker](/roles/docker) - A basic docker installation
++ ![Progress](http://progressed.io/bar/100)   [docker-swarm](/roles/docker-swarm) - A swarm installation (using latest swarm version)
++ ![Progress](http://progressed.io/bar/100)   [stable-docker](/roles/stable-docker)  - The current stable version of docker installation
++ ![Progress](http://progressed.io/bar/20)    [ha-docker-swarm](/roles/ha-docker-swarm) - A high-availability docker swarm installation
++ ![Progress](http://progressed.io/bar/20)    [rancher](/roles/rancher) - A rancher mode installation
++ ![Progress](http://progressed.io/bar/40)    [maas](/roles/maas)  - A basic Ubuntu MaaS installation for inventory management
 
 You can see the support details by clicking the workload name.
 
 ## What does it do ?
-It really depends of the workload you want to deploy, but bundle, by default, you get :
+It really depends of the workload you want to deploy, but bundled, by default, you get :
 - full dynamic inventory from OpenStack, allowing you to grow or shrink your deployment as needed
 - unless specified otherwise, a specific ssh key to the deployment, ensuring only
 people having this key can access the deployed nodes
@@ -20,7 +20,7 @@ people having this key can access the deployed nodes
 avoid any unneeded exposure and the 'private nodes' who are only communicating
 through the local customer-specific network
 - a bridge (bastion technically), for you to be able to access the private nodes securely
-- a proxy configuration, for the private nodes to be able to do update and installations of package
+- a proxy configuration, for the private nodes to be able to do updates and install new packages
 
 ## How to use
 > **Note:** These are currently configured to be used with an Internap Agile Cloud account.

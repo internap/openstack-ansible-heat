@@ -3,8 +3,7 @@
 See [the main documentation](/) for installation instruction and details.
 
 + ![Progress](http://progressed.io/bar/100)   (Ubuntu) Docker installation and configuration
-+ ![Progress](http://progressed.io/bar/0)     (Ubuntu) Security hardnessing
-+ ![Progress](http://progressed.io/bar/0)     (Ubuntu) High availability
++ ![Progress](http://progressed.io/bar/80)    (Ubuntu) Security hardening
 
 ## What does it do ?
 Adding to the basic workload features, this template/recipe add the installation
