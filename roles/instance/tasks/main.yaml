@@ -1,6 +1,36 @@
 ---
 # Playbook to instanciate an OpenStack instance
 
+- name: gather facts about a public network (WAN)
+  os_networks_facts:
+    cloud:                  "{{ os_cloud_name }}"
+    name:                   "{{ os_cloud_publicnetwork_name }}"
+
+- name: gather facts about the public network subnets
+  os_subnets_facts:
+    cloud:                  "{{ os_cloud_name }}"
+    filters:
+      id:                   "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
+
+- name: set public subnet cidr as fact
+  set_fact:
+    os_subnet_public:      "{{ openstack_subnets[ 0 ].cidr }}"
+
+- name: gather facts about a private network (LAN)
+  os_networks_facts:
+    cloud:                  "{{ os_cloud_name }}"
+    name:                   "{{ os_cloud_privatenetwork_name }}"
+
+- name: gather facts about the private network subnets
+  os_subnets_facts:
+    cloud:                  "{{ os_cloud_name }}"
+    filters:
+      id:                   "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
+
+- name: set private subnet cidr as fact
+  set_fact:
+    os_subnet_private:      "{{ openstack_subnets[ 0 ].cidr }}"
+
 - name: ensure security group for public facing nodes exists
   os_security_group:
     cloud:                  "{{ os_cloud_name }}"
@@ -35,6 +65,33 @@
     port_range_max:         22
     remote_ip_prefix:       0.0.0.0/0
 
+- name: ensure all TCP is allowed from private nodes to the public nodes
+  os_security_group_rule:
+    cloud:                  "{{ os_cloud_name }}"
+    security_group:         "{{ playbook_name }}-public-secgroup"
+    protocol:               tcp
+    port_range_min:         1
+    port_range_max:         65535
+    remote_ip_prefix:       "{{ os_subnet_private }}"
+
+- name: ensure all UDP is allowed from private nodes to the public nodes
+  os_security_group_rule:
+    cloud:                  "{{ os_cloud_name }}"
+    security_group:         "{{ playbook_name }}-public-secgroup"
+    protocol:               udp
+    port_range_min:         1
+    port_range_max:         65535
+    remote_ip_prefix:       "{{ os_subnet_private }}"
+
+- name: ensure all ICMP is allowed from private nodes to the public nodes
+  os_security_group_rule:
+    cloud:                  "{{ os_cloud_name }}"
+    security_group:         "{{ playbook_name }}-public-secgroup"
+    protocol:               icmp
+    port_range_min:         1
+    port_range_max:         255
+    remote_ip_prefix:       "{{ os_subnet_private }}"
+
 - name: ensure public-facing nodes are up
   os_server:
     cloud:                  "{{ os_cloud_name }}"
@@ -43,7 +100,7 @@
     image:                  "{{ os_cloud_image_name }}"
     key_name:               "{{ os_key_name }}"
     flavor:                 "{{ os_cloud_flavor_name }}"
-    security_group:         "{{ playbook_name }}-public-secgroup"
+    security_groups:        "{{ playbook_name }}-public-secgroup"
     nics:
       - net-name:           "{{ os_cloud_publicnetwork_name }}"
       - net-name:           "{{ os_cloud_privatenetwork_name }}"

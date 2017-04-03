@@ -60,7 +60,7 @@
   set_fact:
     os_swarm_token:   "{{ hostvars[ os_swarm_lead ].leader_swarm_token.stdout }}"
 
-- name: register swarm nodes
+- name: checking swarm nodes status
   command:            docker info --format={% raw %}"{{json .Swarm.RemoteManagers}}"{% endraw %}
   register:           node_docker_swarm
   until:              node_docker_swarm|success
@@ -70,40 +70,12 @@
   become:             yes
   when:               inventory_hostname != os_swarm_lead
 
-- name: debug swarm token
-  debug:
-    msg:              "{{ node_docker_swarm.stdout }}"
-  when:               inventory_hostname != os_swarm_lead
-
 - name: register swarm nodes
   command:            docker swarm join --token "{{ os_swarm_token }}" "{{ os_swarm_lead_ip }}":2377
   register:           docker_swarm
   until:              docker_swarm|success
   retries:            3
-  delay:              10
+  delay:              20
   ignore_errors:      yes
   become:             yes
   when:               inventory_hostname != os_swarm_lead and os_swarm_token is defined and node_docker_swarm is defined and node_docker_swarm.stdout == "null"
-
-- name: make sure systemd docker directory exists
-  file:
-    path:             /etc/systemd/system/docker.service.d
-    state:            directory
-
-- name: enforce swarm private nodes to use proxy for docker registry operations
-  become:             yes
-  blockinfile:
-    create:           yes
-    state:            present
-    dest:             /etc/systemd/system/docker.service.d/http-proxy.conf
-    insertafter:      EOF
-    block:  |
-                      [Service]
-                      Environment="HTTP_PROXY=http://{{ proxy_host_privateip }}:{{ proxy_http_port }}"
-  when:               inventory_hostname != os_swarm_lead and os_swarm_token is defined
-
-- name: reload dockerd configuration
-  systemd:
-    state:            restarted
-    daemon_reload:    yes
-    name:             docker

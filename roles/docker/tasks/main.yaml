@@ -109,3 +109,27 @@
   delay:          15
   ignore_errors:  yes
   when:           groups.private_nodes is defined and inventory_hostname in groups[ 'private_nodes' ]
+
+- name: make sure systemd docker directory exists
+  file:
+    path:             /etc/systemd/system/docker.service.d
+    state:            directory
+
+- name: enforce private nodes to use proxy for docker registry operations
+  become:             yes
+  blockinfile:
+    create:           yes
+    state:            present
+    dest:             /etc/systemd/system/docker.service.d/http-proxy.conf
+    insertafter:      EOF
+    block:  |
+                      [Service]
+                      Environment="HTTP_PROXY=http://{{ proxy_host_privateip }}:{{ proxy_http_port }}"
+  when:               groups.private_nodes is defined and inventory_hostname in groups[ 'private_nodes' ]
+
+- name: reload dockerd configuration
+  systemd:
+    state:            restarted
+    daemon_reload:    yes
+    name:             docker
+  when:             groups.private_nodes is defined and inventory_hostname in groups[ 'private_nodes' ]
