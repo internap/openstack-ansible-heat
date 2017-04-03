@@ -70,6 +70,10 @@ You can see the support details by clicking the workload name.
    ```bash
    brew install python
    ```
+2. Install the OpenStack Client:
+  ```bash
+  pip install python-openstackclient
+  ```
 2. Clone this repo:
   ```bash
   git clone https://github.com/internap/ansible-ansible-heat
