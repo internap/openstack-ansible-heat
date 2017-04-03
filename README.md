@@ -94,7 +94,7 @@ You can see the support details by clicking the workload name.
         username:       api-RANDOM_NUMBER_GIVENTOYOU
         password:       YOUR_PASSWORD
       region_name:      ams01
-    ```
+  ```
 4. launch the Heat template using:
   ```bash
   ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME>
