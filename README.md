@@ -7,7 +7,7 @@ It currently fully support the following workload
 + ![Progress](http://progressed.io/bar/80)   [docker-swarm](/roles/docker-swarm) - A swarm installation (using latest swarm version)
 + ![Progress](http://progressed.io/bar/40)   [maas](/roles/maas)  - A basic Ubuntu MaaS installation for inventory management
 + ![Progress](http://progressed.io/bar/20)   [rancher](/roles/rancher) - A rancher mode installation
-+ ![Progress](http://progressed.io/bar/100)  [docker-stable](/roles/docker-stable)  - The current stable version of docker installation
++ ![Progress](http://progressed.io/bar/100)  [stable-docker](/roles/stable-docker)  - The current stable version of docker installation
 
 You can see the support details by clicking the workload name.
 
