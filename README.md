@@ -11,6 +11,14 @@ It currently fully support the following workload
 
 You can see the support details by clicking the workload name.
 
+## What does it do ?
+It really depends of the workload you want to deploy, but bundle, by default, you get :
+- full dynamic inventory from OpenStack, allowing you to grow or shrink your deployment as needed
+- a separation between 'public nodes' who are internet exposed and hardened to avoid
+any unneeded exposure and the 'private nodes' who are only communicating through the local
+customer-specific network
+- a bridge (bastion technically), for you to be able to access the private nodes securely
+- a proxy configuration, for the private nodes to be able to do update and installations of package
 
 ## How to use
 > **Note:** These are currently configured to be used with an Internap Agile Cloud account.
