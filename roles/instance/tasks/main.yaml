@@ -1,0 +1,75 @@
+---
+# Playbook to instanciate an OpenStack instance
+
+- name: ensure public-facing nodes are up
+  os_server:
+    cloud:                  "{{ os_cloud_name }}"
+    state:                  present
+    name:                   "{{ os_instancename_prefix + item }}"
+    image:                  "{{ os_cloud_image_name }}"
+    key_name:               "{{ os_key_name }}"
+    flavor:                 "{{ os_cloud_flavor_name }}"
+    nics:
+      - net-name:           "{{ os_cloud_publicnetwork_name }}"
+      - net-name:           "{{ os_cloud_privatenetwork_name }}"
+    meta:
+      tags:                 "{{ os_instance_tags }}"
+      groups:               "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},public_nodes"
+      key_name:             "{{ os_key_name }}"
+    wait:                   yes
+  with_sequence:            count="{{ public_node_number | int }}"
+  register:                 created_public_os_instances
+
+- name: wait until SSH is available for public nodes
+  local_action:
+    module:                 wait_for
+    host:                   "{{ item[ 'openstack' ][ 'interface_ip' ] }}"
+    port:                   22
+    delay:                  5
+    timeout:                40
+    state:                  started
+  with_items:               "{{ created_public_os_instances.results }}"
+
+- name: refresh inventory with newly created public-facing nodes
+  add_host:
+    name:                   "{{ item.server.id }}"
+    groups:                 "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},public_nodes"
+    instance_name:          "{{ item.server.name }}"
+    os_uuid:                "{{ item.id }}"
+    os_key_name:            "{{ os_key_name }}"
+    os_instance_tags:       "{{ os_instance_tags }}"
+    publicIPv4:             "{{ ( item.server.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    privateIPv4:            "{{ ( item.server.networks[ os_cloud_privatenetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    os_instancename_prefix: ''
+  with_items:               "{{ created_public_os_instances.results }}"
+
+- name: ensure private instance are up
+  os_server:
+    cloud:                  "{{ os_cloud_name }}"
+    state:                  present
+    name:                   "{{ os_instancename_prefix + ( item|int + public_node_number|int )|string }}"
+    image:                  "{{ os_cloud_image_name }}"
+    key_name:               "{{ os_key_name }}"
+    flavor:                 "{{ os_cloud_flavor_name }}"
+    network:                "{{ os_cloud_privatenetwork_name }}"
+    meta:
+      tags:                 "{{ os_instance_tags }}"
+      groups:               "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},private_nodes"
+      key_name:             "{{ os_key_name }}"
+    wait:                   yes
+  register:                 created_private_os_instances
+  with_sequence:            count="{{ private_node_number | int }}"
+
+- name: refresh inventory with newly created private nodes
+  add_host:
+    name:                   "{{ item.server.id }}"
+    groups:                 "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},private_nodes"
+    instance_name:          "{{ item.server.name }}"
+    os_uuid:                "{{ item.id }}"
+    os_key_name:            "{{ os_key_name }}"
+    os_instance_tags:       "{{ os_instance_tags }}"
+    publicIPv4:             "{{ ( item.server.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    privateIPv4:            "{{ ( item.server.networks[ os_cloud_privatenetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    os_instancename_prefix: ''
+  with_items:               "{{ created_private_os_instances.results }}"
+  when:                     private_node_number > 0

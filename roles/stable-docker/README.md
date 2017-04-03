@@ -26,7 +26,7 @@ specified in the public_node_count parameter as private nodes.
   ```
 * using Heat:
   ```bash
-  ./openstack-heat --os_cloud=<MY_CLOUDS_YAML_PROFILE> --role=docker-stable --node_count=4
+  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=docker-stable --node_count=4
   ```
 
 # Contributing

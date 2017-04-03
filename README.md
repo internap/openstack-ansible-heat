@@ -126,7 +126,7 @@ through the local customer-specific network
   ```
 * using Heat:
   ```bash
-  ./openstack-heat --os_cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node_count=4 --key_filename=/tmp/blabla
+  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node-count=4 --key-filename=/tmp/blabla
   ```
 
 # Contributing
