@@ -17,29 +17,29 @@ You can see the support details by clicking the workload name.
 
 #### Using Ansible
 1. First, install Ansible:
-⋅⋅* On Ubuntu
+  * On Ubuntu
 
-⋅⋅```bash
+  ```bash
 sudo apt-get install ansible
 ```
-⋅⋅* On CentOS
-⋅⋅```bash
+  * On CentOS
+  ```bash
 sudo yum install ansible
 ```
-⋅⋅* On MacOSX (you need to have brew installed)
-⋅⋅```bash
+  * On MacOSX (you need to have brew installed)
+  ```bash
 brew install ansible
 ```
 2. Clone this repo :
-⋅⋅```bash
+  ```bash
 git clone https://github.com/internap/ansible-ansible-heat
 ```
 3. Make sure your clouds.yaml file is configured properly:
-⋅⋅```bash
+  ```bash
 cat ~/.config/openstack/clouds.yaml
 ```
-⋅ it should look something like :
-⋅```text
+  it should look something like :
+ ```text
 clouds:
   inap-AMSDemo1:
     profile: internap
@@ -53,34 +53,34 @@ clouds:
 ```
 
 4. launch the Ansible playbook using :
-⋅```bash
+ ```bash
 ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME>
 ```
 
 #### Using Heat
 1. First, install pip and python:
-⋅⋅* On Ubuntu
-⋅⋅```bash
+  * On Ubuntu
+  ```bash
 apt install python-dev python-pip
 ```
-⋅⋅* On CentOS
-⋅⋅```bash
+  * On CentOS
+  ```bash
 yum install python-devel python-pip
 ```
-⋅⋅* On MacOSX (you need to have brew installed)
-⋅⋅```bash
+  * On MacOSX (you need to have brew installed)
+  ```bash
 brew install python
 ```
 2. Clone this repo :
-⋅```bash
+ ```bash
 git clone https://github.com/internap/ansible-ansible-heat
 ```
 3. Make sure your clouds.yaml file is configured properly:
-⋅```bash
+ ```bash
 cat ~/.config/openstack/clouds.yaml
 ```
-⋅ it should look something like :
-⋅```text
+  it should look something like :
+ ```text
 clouds:
   inap-AMSDemo1:
     profile:        internap
@@ -93,7 +93,7 @@ clouds:
     region_name:      ams01
 ```
 4. launch the Heat template using :
-⋅```bash
+ ```bash
 ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME>
 ```
 
@@ -101,18 +101,18 @@ clouds:
 * node_count= the total number of node you want to create/maintain
 * public_node_count= the number of node you want to be public facing
 * action= a non-default action to trigger, that can be :
-⋅- delete: the script will then delete all existing instances
-⋅- delete_all: the script will delete instance, local config files and keys in OS
-⋅- delete_all_includinguserkey: the script will wipe keys and instances both in OS and locally
+ - delete: the script will then delete all existing instances
+ - delete_all: the script will delete instance, local config files and keys in OS
+ - delete_all_includinguserkey: the script will wipe keys and instances both in OS and locally
 * key_filename= explicit SSH key file name to use
 
 Which would mean, for a 4 node docker swarm cluster using a shared ssh key stored in /tmp/blabla:
 * using Ansible:
-⋅```bash
+ ```bash
 ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME> -e node_count=4 -e key_filename=/tmp/blabla
 ```
 * using Heat:
-⋅```bash
+ ```bash
 ./openstack-heat --os_cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node_count=4 --key_filename=/tmp/blabla
 ```
 
