@@ -1,4 +1,4 @@
-### An ansible AND heat template repository to manage different workload on an OpenStack certified public cloud
+### An ansible playbook repository to manage different workload on an OpenStack certified public cloud
 
 
 It currently fully support the following workload:
