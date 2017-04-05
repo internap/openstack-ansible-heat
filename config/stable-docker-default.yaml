@@ -1,0 +1,4 @@
+parameters:
+  role:               stable-docker
+  keypair_name:       MacBookPro
+  node_count:         1

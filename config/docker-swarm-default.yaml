@@ -1,0 +1,4 @@
+parameters:
+  role:               docker-swarm
+  keypair_name:       MacBookPro
+  node_count:         2

@@ -24,7 +24,7 @@
   vars:
     playbook_name:        "{{ role }}-ansible"
   vars_files:
-    - data/{{ role }}-default.yaml
+    - config/{{ role }}-default.yaml
   roles:
     - { role: inventory,  when: "action is defined and 'delete' in action and action != 'local'" }
     - { role: cleanup,    when: "action is defined and 'delete' in action and action != 'local'" }
@@ -36,7 +36,7 @@
   vars:
     playbook_name:        "{{ role }}-ansible"
   vars_files:
-    - data/{{ role }}-default.yaml
+    - config/{{ role }}-default.yaml
   roles:
     - { role: inventory,  when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
     - { role: keys,       when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
@@ -50,7 +50,7 @@
   vars:
     playbook_name:        "{{ role }}-ansible"
   vars_files:
-    - data/{{ role }}-default.yaml
+    - config/{{ role }}-default.yaml
   roles:
     - { role: inventory,  when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
     - { role: bastion,    when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
@@ -61,7 +61,7 @@
   vars:
     playbook_name:        "{{ role }}-ansible"
   vars_files:
-    - data/{{ role }}-default.yaml
+    - config/{{ role }}-default.yaml
   roles:
     - { role: inventory,  when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
     - { role: bastion,    when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
@@ -74,6 +74,6 @@
   vars:
     playbook_name:        "{{ role }}-ansible"
   vars_files:
-    - data/{{ role }}-default.yaml
+    - config/{{ role }}-default.yaml
   roles:
     - "{{ role }}"

@@ -1,0 +1,4 @@
+parameters:
+  role:               rancher
+  keypair_name:       MacBookPro
+  node_count:         1

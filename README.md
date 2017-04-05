@@ -25,7 +25,6 @@ through the local customer-specific network
 ## How to use
 > **Note:** These are currently configured to be used with an Internap Agile Cloud account.
 
-#### Using Ansible
 1. First, install Ansible:
    * On Ubuntu
    ```bash
@@ -64,50 +63,6 @@ through the local customer-specific network
 4. launch the Ansible playbook using :
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME>
-  ```
-
-#### Using Heat
-1. First, install pip and python:
-   * On Ubuntu
-   ```bash
-   apt install python-dev python-pip
-   ```
-   * On CentOS
-   ```bash
-   yum install python-devel python-pip
-   ```
-   * On MacOSX (you need to have brew installed)
-   ```bash
-   brew install python
-   ```
-2. Install the OpenStack Client:
-  ```bash
-  pip install python-openstackclient
-  ```
-2. Clone this repo:
-  ```bash
-  git clone https://github.com/internap/ansible-ansible-heat
-  ```
-3. Make sure your clouds.yaml file is configured properly:
-  ```bash
-  cat ~/.config/openstack/clouds.yaml
-  ```
-  it should look something like:
-  ```text
-  clouds:
-    inap-AMSDemo1:
-      profile:        internap
-      auth:
-        auth_url:       https://identity.api.cloud.iweb.com/v3
-        project_name:   inap-12345
-        domain_name:    default
-        username:       api-RANDOM_NUMBER_GIVENTOYOU
-        password:       YOUR_PASSWORD
-      region_name:      ams01
-  ```
-4. launch the Heat template using:
-  ```bash
-  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME>
   ```
 
 ### Optional parameters:

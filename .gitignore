@@ -67,5 +67,5 @@ venv/
 ENV/
 
 unfinished
-data/config
+config/data
 *.retry

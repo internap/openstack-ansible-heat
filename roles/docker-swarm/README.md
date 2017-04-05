@@ -25,10 +25,6 @@ the internet unless you go through the ssh bastion server.
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=docker-swarm -e node_count=4
   ```
-* using Heat:
-  ```bash
-  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=docker-swarm --node_count=4
-  ```
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!

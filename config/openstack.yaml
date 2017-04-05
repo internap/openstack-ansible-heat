@@ -1,8 +1,6 @@
-parameters:
-  role:               maas
-  flavor_name:        A1.2
+openstack_env:
   image_name:         Ubuntu 16.04 LTS (Xenial Xerus)
+  flavor_name:        A1.1
+  controller_flavor:  A1.1
   network_wan:        inap-18000-WAN1110
   network_lan:        inap-18000-LAN2011
-  keypair_name:       MacBookPro
-  node_count:         3

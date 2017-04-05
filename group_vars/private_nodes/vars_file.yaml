@@ -1,2 +1,2 @@
 #this allow the bastion to be used during the playbook run
-ansible_ssh_common_args:        "-F ./data/config/{{ playbook_name }}-ssh_config -o LogLevel=QUIET"
+ansible_ssh_common_args:        "-F ./config/data/{{ playbook_name }}-ssh_config -o LogLevel=QUIET"

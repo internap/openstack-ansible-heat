@@ -16,7 +16,7 @@
   ignore_errors:  yes
   become:         yes
 
-- name: launch rancher container manuallay
+- name: launch rancher container manually
   shell:          docker run -d --restart=unless-stopped -p 8080:8080 rancher/server
   retries:        3
   delay:          75

@@ -17,13 +17,13 @@
 
 - name: checking if bastion config exists
   stat:
-    path:         "./data/config/{{ playbook_name }}-ssh_config"
+    path:         "./config/data/{{ playbook_name }}-ssh_config"
   register:       bastionconfig_exist
   when:           not 'local' in action and 'delete' in action
 
 - name: delete bastion config
   file:
-      path:       "./data/config/{{ playbook_name }}-ssh_config"
+      path:       "./config/data/{{ playbook_name }}-ssh_config"
       state:      absent
   when:           not 'local' in action and 'delete' in action and bastionconfig_exist.stat.exists == True
 

@@ -27,7 +27,7 @@
 - name: configure SSH bastion
   blockinfile:
     create:                 yes
-    dest:                   "./data/config/{{ playbook_name }}-ssh_config"
+    dest:                   "./config/data/{{ playbook_name }}-ssh_config"
     marker:                 "#{mark} BASTION"
     block: |
                             Host {{ bastion_host_publicip }}
@@ -46,7 +46,7 @@
 - name: configure local inbound connection to go through bastion
   blockinfile:
     create:                 yes
-    dest:                   "./data/config/{{ playbook_name }}-ssh_config"
+    dest:                   "./config/data/{{ playbook_name }}-ssh_config"
     marker:                 "#{mark} FORDARDED INSTANCE {{ item }}"
     block: |
                             Host {{ hostvars[ item ].privateIPv4 }}

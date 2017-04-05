@@ -1,0 +1,4 @@
+parameters:
+  role:               maas
+  keypair_name:       MacBookPro
+  node_count:         3
