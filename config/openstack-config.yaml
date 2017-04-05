@@ -1,4 +1,4 @@
-openstack_env:
+openstack_config:
   image_name:         Ubuntu 16.04 LTS (Xenial Xerus)
   flavor_name:        A1.1
   controller_flavor:  A1.1

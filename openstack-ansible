@@ -19,61 +19,64 @@
 ---
 # Generic playbook for Openstack
 - name: "________________________ Cleaning up (if asked) ________________________"
-  connection:             local
-  hosts:                  localhost
+  connection:                     local
+  hosts:                          localhost
   vars:
-    playbook_name:        "{{ role }}-ansible"
+    playbook_name:                "{{ role }}-ansible"
   vars_files:
-    - config/{{ role }}-default.yaml
+    - config/openstack-config.yaml
   roles:
-    - { role: inventory,  when: "action is defined and 'delete' in action and action != 'local'" }
-    - { role: cleanup,    when: "action is defined and 'delete' in action and action != 'local'" }
+    - { role: inventory,            when: "action is defined and 'delete' in action and action != 'local'" }
+    - { role: inventory-cleanup,    when: "action is defined and 'delete' in action and action != 'local'" }
 
 
 - name: "_____________________ OpenStack instance management ____________________"
-  connection:             local
-  hosts:                  localhost
+  connection:                     local
+  hosts:                          localhost
   vars:
-    playbook_name:        "{{ role }}-ansible"
+    playbook_name:                "{{ role }}-ansible"
   vars_files:
-    - config/{{ role }}-default.yaml
+    - config/openstack-config.yaml
+    - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,  when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
-    - { role: keys,       when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
-    - { role: instance,   when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
+    - { role: inventory,          when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
+    - { role: inventory-keys,     when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
+    - { role: inventory-instance, when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
 
 
 
 - name: "____________________ Meta-roles local preparation  _____________________"
-  connection:             local
-  hosts:                  localhost
+  connection:                     local
+  hosts:                          localhost
   vars:
-    playbook_name:        "{{ role }}-ansible"
+    playbook_name:                "{{ role }}-ansible"
   vars_files:
-    - config/{{ role }}-default.yaml
+    - config/openstack-config.yaml
+    - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,  when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: bastion,    when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: proxy,      when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
 
 - name: "____________________ Meta-roles remote execution  ______________________"
-  hosts:                  "{{ playbook_name }}"
+  hosts:                          "{{ playbook_name }}"
   vars:
-    playbook_name:        "{{ role }}-ansible"
+    playbook_name:                "{{ role }}-ansible"
   vars_files:
-    - config/{{ role }}-default.yaml
+    - config/openstack-config.yaml
+    - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,  when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: bastion,    when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: proxy,      when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
 
 
 
 - name:  "______________________ {{ role }} role execution ______________________"
-  hosts:                  "{{ playbook_name }}"
+  hosts:                          "{{ playbook_name }}"
   vars:
-    playbook_name:        "{{ role }}-ansible"
+    playbook_name:                "{{ role }}-ansible"
   vars_files:
-    - config/{{ role }}-default.yaml
+    - config/openstack-config.yaml
   roles:
     - "{{ role }}"

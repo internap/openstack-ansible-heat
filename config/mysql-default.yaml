@@ -1,4 +1,0 @@
-parameters:
-  role:               mysql
-  keypair_name:       MacBookPro
-  node_count:         1

@@ -1,0 +1,13 @@
+---
+# Playbook to implement a keepalived floating IP
+
+
+- name: creating neutron port
+  os_port:
+    cloud:                  "{{ os_cloud_name }}"
+    name:                   "{{ playbook_name }}-keepalived-port"
+    network:                "{{ os_cloud_publicnetwork_name }}"
+
+- name: show port facts
+  os_port_facts:
+    cloud:                  "{{ os_cloud_name }}"

@@ -1,5 +1,0 @@
-parameters:
-  role:               ha-docker-swarm
-  keypair_name:       MacBookPro
-  node_count:         4
-  public_node_count:  2

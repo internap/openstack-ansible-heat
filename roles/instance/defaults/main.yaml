@@ -1,2 +1,0 @@
-os_cloud_image_name:            "{{ image_name          | default( ( parameters is defined and parameters.image_name is defined )           | ternary( parameters.image_name,           'Ubuntu 16.04 LTS (Xenial Xerus)' ) ) }}"
-os_cloud_flavor_name:           "{{ flavor_name         | default( ( parameters is defined and parameters.flavor_name is defined )          | ternary( parameters.flavor_name,          '' ) ) }}"
