@@ -59,8 +59,33 @@ through the local customer-specific network
         password:       YOUR_PASSWORD
       region_name:      ams01
   ```
+    * To find your project name, user name and password
+      * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
+      * For your username and password, go to your Internap account (login.internap.com),
+      * Click the 'My Infrastructure > Horizon and API Access' tab in the menu on the top
+      * If you never got any API Username and Password, you can click on the 'Get New API Credentials' button
+      * BEWARE : If you did but don't remember them, clicking that button will regenerate new credentials and expire the old one, blocking any other access with them, including any application that would use those old credentials
+      * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
 
-4. launch the Ansible playbook using :
+  3. Adapt your Openstack config file to your account:
+    ```bash
+    cat config/openstack-config.yaml
+    ```
+    it should look something like :
+   ```text
+   openstack_config:
+     image_name:         Ubuntu 16.04 LTS (Xenial Xerus)    #this is the OS image we'll be using
+     flavor_name:        A1.1                               #this is the default flavor we'll be using
+     controller_flavor:  A1.1                               #this is the flavor we'll be using for 'controller' node (see specifif role for details)
+     network_wan:        inap-18000-WAN1110                 #this is the WAN network name that was given to you
+     network_lan:        inap-18000-LAN2011                 #this is the LAN network name that was given to you
+    ```
+      * To find your WAN and LAN
+        * Go your Horizon portal (horizon.internap.com),
+        * Click the 'Network > Networks' tab in the menu on the left
+        * Copy and paste the full name displayed in the 'Name' column,the format should be <YOURPROJECTNAME>-WANXXXX
+
+5. You can now launch the Ansible playbook using :
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME>
   ```

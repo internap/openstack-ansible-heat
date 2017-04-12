@@ -79,4 +79,5 @@
   vars_files:
     - config/openstack-config.yaml
   roles:
+    - { role: inventory }
     - "{{ role }}"
