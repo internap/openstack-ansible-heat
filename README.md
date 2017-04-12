@@ -69,9 +69,11 @@ through the local customer-specific network
       * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
 
   3. Adapt your Openstack config file to your account:
+
     ```bash
     cat config/openstack-config.yaml
     ```
+
     it should look something like :
       ```text
         openstack_config:
