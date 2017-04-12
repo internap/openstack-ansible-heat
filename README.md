@@ -43,9 +43,9 @@ through the local customer-specific network
    git clone https://github.com/internap/ansible-ansible-heat
   ```
 3. Make sure your clouds.yaml file is configured properly:
-  ```bash
-  cat ~/.config/openstack/clouds.yaml
-  ```
+    ```
+    cat ~/.config/openstack/clouds.yaml
+    ```
     it should look something like :
       ```text
         clouds:
@@ -69,7 +69,7 @@ through the local customer-specific network
       * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
 
   3. Adapt your Openstack config file to your account:
-    ```bash
+    ```
     cat config/openstack-config.yaml
     ```    
     it should look something like :
