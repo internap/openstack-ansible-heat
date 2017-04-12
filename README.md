@@ -61,7 +61,7 @@ through the local customer-specific network
       ```
 
     * To find your project name, user name and password
-      * Go to your Internap account (login.internap.com),
+      * Go to your Internap account (![login.internap.com](login.internap.com)),
       * Click the 'My Infrastructure > Horizon and API Access' tab in the menu on the top
       * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
       * For your username and password
@@ -84,7 +84,7 @@ through the local customer-specific network
       ```
 
       * To find your WAN and LAN
-        * Go your Horizon portal (horizon.internap.com),
+        * Go your Horizon portal (![horizon.internap.com](horizon.internap.com)),
         * Click the 'Network > Networks' tab in the menu on the left
         * Copy and paste the full name displayed in the 'Name' column,the format should be <YOURPROJECTNAME>-WANXXXX
 
