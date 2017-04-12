@@ -61,12 +61,13 @@ through the local customer-specific network
       ```
 
     * To find your project name, user name and password
-      * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
-      * For your username and password, go to your Internap account (login.internap.com),
+      * Go to your Internap account (login.internap.com),
       * Click the 'My Infrastructure > Horizon and API Access' tab in the menu on the top
-      * If you never got any API Username and Password, you can click on the 'Get New API Credentials' button
-      * BEWARE : If you did but don't remember them, clicking that button will regenerate new credentials and expire the old one, blocking any other access with them, including any application that would use those old credentials
-      * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
+      * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
+      * For your username and password
+        * If you never got any API Username and Password, you can click on the 'Get New API Credentials' button
+        * BEWARE : If you did but don't remember them, clicking that button will regenerate new credentials and expire the old one, blocking any other access with them, including any application that would use those old credentials
+        * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
 
   3. Adapt your Openstack config file to your account:
     ```
