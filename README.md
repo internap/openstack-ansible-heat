@@ -107,10 +107,6 @@ through the local customer-specific network
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=<THE_WORKLOAD_NAME> -e node_count=4 -e key_filename=/tmp/blabla
   ```
-* using Heat:
-  ```bash
-  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=<THE_WORKLOAD_NAME> --node-count=4 --key-filename=/tmp/blabla
-  ```
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!
