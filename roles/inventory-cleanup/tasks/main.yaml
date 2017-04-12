@@ -34,7 +34,14 @@
       state:                absent
       name:                 "{{ os_key_name }}"
 
-- name: delete security group for public facing nodes
+- name: delete all port created in OpenStack
+  when: '"delete_all" in action'
+  os_port:
+    cloud:                  "{{ os_cloud_name }}"
+    state:                  absent
+    name:                   "{{ playbook_name }}-keepalived-port"
+
+- name: delete security group for public facing nodes in OpenStack
   os_security_group:
     cloud:                  "{{ os_cloud_name }}"
     state:                  absent
