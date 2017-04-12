@@ -46,20 +46,21 @@ through the local customer-specific network
   ```bash
   cat ~/.config/openstack/clouds.yaml
   ```
-  it should look something like :
- ```text
-  clouds:
-    inap-AMSDemo1:
-      profile: internap
-      auth:
-        auth_url:       https://identity.api.cloud.iweb.com/v3
-        project_name:   inap-12345
-        domain_name:    default
-        username:       api-RANDOM_NUMBER_GIVENTOYOU
-        password:       YOUR_PASSWORD
-      region_name:      ams01
-  ```
-    * To find your project name, user name and password
+    it should look something like :
+    ```text
+    clouds:
+      inap-AMSDemo1:
+        profile: internap
+        auth:
+          auth_url:       https://identity.api.cloud.iweb.com/v3
+          project_name:   inap-12345
+          domain_name:    default
+          username:       api-RANDOM_NUMBER_GIVENTOYOU
+          password:       YOUR_PASSWORD
+          region_name:      ams01
+    ```
+
+     * To find your project name, user name and password
       * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
       * For your username and password, go to your Internap account (login.internap.com),
       * Click the 'My Infrastructure > Horizon and API Access' tab in the menu on the top
