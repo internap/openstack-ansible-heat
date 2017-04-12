@@ -47,20 +47,20 @@ through the local customer-specific network
   cat ~/.config/openstack/clouds.yaml
   ```
     it should look something like :
-    ```text
-    clouds:
-      inap-AMSDemo1:
-        profile: internap
-        auth:
-          auth_url:       https://identity.api.cloud.iweb.com/v3
-          project_name:   inap-12345
-          domain_name:    default
-          username:       api-RANDOM_NUMBER_GIVENTOYOU
-          password:       YOUR_PASSWORD
-          region_name:      ams01
-    ```
+      ```text
+        clouds:
+          inap-AMSDemo1:
+            profile: internap
+            auth:
+              auth_url:       https://identity.api.cloud.iweb.com/v3
+              project_name:   inap-12345
+              domain_name:    default
+              username:       api-RANDOM_NUMBER_GIVENTOYOU
+              password:       YOUR_PASSWORD
+            region_name:      ams01
+      ```
 
-     * To find your project name, user name and password
+    * To find your project name, user name and password
       * Your project name is displayed in the "Option 2 : API" description under the field 'Tenant Name'
       * For your username and password, go to your Internap account (login.internap.com),
       * Click the 'My Infrastructure > Horizon and API Access' tab in the menu on the top
@@ -73,14 +73,15 @@ through the local customer-specific network
     cat config/openstack-config.yaml
     ```
     it should look something like :
-   ```text
-   openstack_config:
-     image_name:         Ubuntu 16.04 LTS (Xenial Xerus)    #this is the OS image we'll be using
-     flavor_name:        A1.1                               #this is the default flavor we'll be using
-     controller_flavor:  A1.1                               #this is the flavor we'll be using for 'controller' node (see specifif role for details)
-     network_wan:        inap-18000-WAN1110                 #this is the WAN network name that was given to you
-     network_lan:        inap-18000-LAN2011                 #this is the LAN network name that was given to you
-    ```
+      ```text
+        openstack_config:
+          image_name:         Ubuntu 16.04 LTS (Xenial Xerus)    #this is the OS image we'll be using
+          flavor_name:        A1.1                               #this is the default flavor we'll be using
+          controller_flavor:  A1.1                               #this is the flavor we'll be using for 'controller' node (see specifif role for details)
+          network_wan:        inap-18000-WAN1110                 #this is the WAN network name that was given to you
+          network_lan:        inap-18000-LAN2011                 #this is the LAN network name that was given to you
+      ```
+
       * To find your WAN and LAN
         * Go your Horizon portal (horizon.internap.com),
         * Click the 'Network > Networks' tab in the menu on the left
