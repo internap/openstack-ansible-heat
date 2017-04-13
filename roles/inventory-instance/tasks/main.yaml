@@ -1,36 +1,6 @@
 ---
 # Playbook to instanciate an OpenStack instance
 
-- name: gather facts about a public network (WAN)
-  os_networks_facts:
-    cloud:                  "{{ os_cloud_name }}"
-    name:                   "{{ os_cloud_publicnetwork_name }}"
-
-- name: gather facts about the public network subnets
-  os_subnets_facts:
-    cloud:                  "{{ os_cloud_name }}"
-    filters:
-      id:                   "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
-
-- name: set public subnet cidr as fact
-  set_fact:
-    os_subnet_public:      "{{ openstack_subnets[ 0 ].cidr }}"
-
-- name: gather facts about a private network (LAN)
-  os_networks_facts:
-    cloud:                  "{{ os_cloud_name }}"
-    name:                   "{{ os_cloud_privatenetwork_name }}"
-
-- name: gather facts about the private network subnets
-  os_subnets_facts:
-    cloud:                  "{{ os_cloud_name }}"
-    filters:
-      id:                   "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
-
-- name: set private subnet cidr as fact
-  set_fact:
-    os_subnet_private:      "{{ openstack_subnets[ 0 ].cidr }}"
-
 - name: ensure security group for public facing nodes exists
   os_security_group:
     cloud:                  "{{ os_cloud_name }}"
@@ -72,7 +42,7 @@
     protocol:               tcp
     port_range_min:         1
     port_range_max:         65535
-    remote_ip_prefix:       "{{ os_subnet_private }}"
+    remote_ip_prefix:       "{{ os_cloud_privatesubnet_cidr }}"
 
 - name: ensure all UDP is allowed from private nodes to the public nodes
   os_security_group_rule:
@@ -81,7 +51,7 @@
     protocol:               udp
     port_range_min:         1
     port_range_max:         65535
-    remote_ip_prefix:       "{{ os_subnet_private }}"
+    remote_ip_prefix:       "{{ os_cloud_privatesubnet_cidr }}"
 
 - name: ensure all ICMP is allowed from private nodes to the public nodes
   os_security_group_rule:
@@ -90,7 +60,7 @@
     protocol:               icmp
     port_range_min:         1
     port_range_max:         255
-    remote_ip_prefix:       "{{ os_subnet_private }}"
+    remote_ip_prefix:       "{{ os_cloud_privatesubnet_cidr }}"
 
 - name: ensure public-facing nodes are up
   os_server:
