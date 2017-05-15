@@ -23,10 +23,6 @@ specified in the public_node_count parameter as private nodes.
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=docker-stable -e node_count=4
   ```
-* using Heat:
-  ```bash
-  ./openstack-heat --os-cloud=<MY_CLOUDS_YAML_PROFILE> --role=docker-stable --node_count=4
-  ```
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!
