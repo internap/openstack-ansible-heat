@@ -46,22 +46,35 @@
 - debug:
     msg:                  "{{ os_docker_registry_ip }}"
 
+- debug:
+    msg:                  "docker run -d -p 5000:5000 --restart=always --name registry \
+                               -e REGISTRY_STORAGE=swift \
+                               -e REGISTRY_STORAGE_SWIFT_USERNAME={{ os_auth_params.username }} \
+                               -e REGISTRY_STORAGE_SWIFT_PASSWORD={{ os_auth_params.password }} \
+                               -e REGISTRY_STORAGE_SWIFT_AUTHURL={{ os_auth_params.auth_url }} \
+                               -e REGISTRY_STORAGE_SWIFT_TENANT={{ os_auth_params.project_name }} \
+                               -e REGISTRY_STORAGE_SWIFT_DOMAIN={{ os_auth_params.project_domain_name }} \
+                               -e REGISTRY_STORAGE_SWIFT_REGION={{ os_auth_region_name }} \
+                               -e REGISTRY_STORAGE_SWIFT_CONTAINER={{ playbook_name }} \
+                               -e REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY=yes \
+                               registry:2"
 
-# - name: ensure Docker Registry is up
-#   command:            "docker run -d -p 5000:5000 --restart=always --name registry \
-#                           -e REGISTRY_STORAGE_SWIFT_USERNAME={{ os_auth_params.auth.username }} \
-#                           -e REGISTRY_STORAGE_SWIFT_PASSWORD={{ os_auth_params.password }} \
-#                           -e REGISTRY_STORAGE_SWIFT_AUTHURL={{ os_auth_params.auth_url }} \
-#                           -e REGISTRY_STORAGE_SWIFT_TENANT={{ os_auth_params.project_name }} \
-#                           -e REGISTRY_STORAGE_SWIFT_DOMAIN={{ os_auth_params.project_domain_name }} \
-#                           -e REGISTRY_STORAGE_SWIFT_REGION={{ os_auth_region_name }} \
-#                           -e REGISTRY_STORAGE_SWIFT_CONTAINER={{ playbook_name }} \
-#                           -e REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY=yes \
-#                           registry:2"
-#
-#   register:           docker_registry_up
-#   until:              docker_registry_up|success
-#   retries:            3
-#   delay:              20
-#   ignore_errors:      yes
-#   become:             yes
+- name: ensure Docker Registry is up
+  when:                   inventory_hostname == os_docker_registry
+  command:                "docker run -d -p 5000:5000 --restart=always --name registry \
+                            -e REGISTRY_STORAGE=swift \
+                            -e REGISTRY_STORAGE_SWIFT_USERNAME={{ os_auth_params.username }} \
+                            -e REGISTRY_STORAGE_SWIFT_PASSWORD={{ os_auth_params.password }} \
+                            -e REGISTRY_STORAGE_SWIFT_AUTHURL={{ os_auth_params.auth_url }} \
+                            -e REGISTRY_STORAGE_SWIFT_TENANT={{ os_auth_params.project_name }} \
+                            -e REGISTRY_STORAGE_SWIFT_DOMAIN={{ os_auth_params.project_domain_name }} \
+                            -e REGISTRY_STORAGE_SWIFT_REGION={{ os_auth_region_name }} \
+                            -e REGISTRY_STORAGE_SWIFT_CONTAINER={{ playbook_name }} \
+                            -e REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY=yes \
+                            registry:2"
+  register:                 docker_registry_up
+  until:                    docker_registry_up|success
+  retries:                  3
+  delay:                    20
+  ignore_errors:            yes
+  become:                   yes

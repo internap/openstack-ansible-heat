@@ -55,10 +55,6 @@
       device_id:                  "{{ inventory_hostname }}"
       network_id:                 "{{ os_cloud_publicnetwork_id }}"
 
-- name: debug neutron port for WAN of public nodes
-  debug:
-    msg:                          "{{ openstack_ports }}"
-
 - name: ensure neutron port for WAN of public nodes allow virtual routeur IP address
   when:                           groups[ 'public_nodes' ] is defined and inventory_hostname in groups[ 'public_nodes' ]
   connection:                     local

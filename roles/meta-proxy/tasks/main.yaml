@@ -53,7 +53,7 @@
     group:                  root
     mode:                   0644
   notify:
-    - restart squid
+    - restart Squid
 
 - name: ensure Squid service is started and enabled on boot
   when:                     inventory_hostname == proxy_host
@@ -74,3 +74,55 @@
     block:  |
                             Acquire::http::Proxy "http://{{ proxy_host_privateip }}:{{ proxy_http_port }}";
                             Acquire::https::Proxy "https://{{ proxy_host_privateip }}:{{ proxy_http_port }}";
+
+- name: install Bind9
+  when:                     inventory_hostname == proxy_host
+  become:                   yes
+  apt:                      pkg={{ item }} state=installed
+  register:                 apt_result
+  until:                    apt_result|success
+  retries:                  3
+  delay:                    30
+  ignore_errors:            yes
+  with_items:
+  - bind9
+  - bind9utils
+  - bind9-doc
+
+- name: check Bind9 configuration file
+  when:                     inventory_hostname == proxy_host
+  become:                   yes
+  template:
+    src:                    named.conf.options.j2
+    dest:                   /etc/bind/named.conf.options
+    owner:                  root
+    group:                  root
+    mode:                   0644
+  notify:
+  - restart Bind9
+
+- name: ensure Bind9 service is started and enabled on boot
+  when:                     inventory_hostname == proxy_host
+  become:                   yes
+  service:
+    name:                   bind9
+    state:                  started
+    enabled:                yes
+
+- name: enforce private node to not use default DNS resolver
+  when:                     inventory_hostname in groups[ 'private_nodes' ]
+  become:                   yes
+  replace:
+    dest:                   /etc/resolv.conf
+    regexp:                 '^nameserver '
+    replace:                '#nameserver '
+
+- name: enforce private node to use proxy for DNS operations
+  when:                     inventory_hostname in groups[ 'private_nodes' ]
+  become:                   yes
+  lineinfile:
+    create:                 yes
+    state:                  present
+    dest:                   /etc/resolv.conf
+    insertbefore:           BOF
+    line:                   "nameserver {{ proxy_host_privateip }}"

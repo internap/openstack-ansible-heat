@@ -54,9 +54,9 @@
     - config/openstack-config.yaml
     - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 - name: "____________________ Meta-roles remote execution  ______________________"
   hosts:                          "{{ playbook_name }}"
@@ -66,9 +66,9 @@
     - config/openstack-config.yaml
     - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
-    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 and ( node_number | int  > public_node_number | int ) )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 
 
