@@ -27,110 +27,109 @@
     router_host_privateip:   "{{ hostvars[ router_host ].privateIPv4 }}"
 
 - name: finding private-facing port of router node
-  when:                     inventory_hostname == router_host
-  connection:               local
+  when:                       inventory_hostname == router_host
+  connection:                 local
   os_port_facts:
-    cloud:                  "{{ os_cloud_name }}"
+    cloud:                    "{{ os_cloud_name }}"
     filters:
-      device_id:            "{{ inventory_hostname }}"
-      network_id:           "{{ os_cloud_privatenetwork_id }}"
-      status:               ACTIVE
+      device_id:              "{{ inventory_hostname }}"
+      network_id:             "{{ os_cloud_privatenetwork_id }}"
+      status:                 ACTIVE
 
 - name: allow ip pairs for the internet to private-facing interface of router node
-  when:                     inventory_hostname == router_host
-  connection:               local
+  when:                       inventory_hostname == router_host
+  connection:                 local
   os_port:
-    cloud:                  "{{ os_cloud_name }}"
-    state:                  present
-    name:                   "{{ openstack_ports[ 0 ].id }}"
+    cloud:                    "{{ os_cloud_name }}"
+    state:                    present
+    name:                     "{{ openstack_ports[ 0 ].id }}"
     allowed_address_pairs:
-      - ip_address:         "0.0.0.0/0"
+      - ip_address:           "0.0.0.0/0"
 
 - name: finding private-facing port of private nodes
-  when:                     inventory_hostname in groups[ 'private_nodes' ]
-  connection:               local
+  when:                       inventory_hostname in groups[ 'private_nodes' ]
+  connection:                 local
   os_port_facts:
-    cloud:                  "{{ os_cloud_name }}"
+    cloud:                    "{{ os_cloud_name }}"
     filters:
-      device_id:            "{{ inventory_hostname }}"
-      network_id:           "{{ os_cloud_privatenetwork_id }}"
-      status:               ACTIVE
+      device_id:              "{{ inventory_hostname }}"
+      network_id:             "{{ os_cloud_privatenetwork_id }}"
+      status:                 ACTIVE
 
 - name: allow ip pairs for the internet to private-facing interface of private nodes
-  when:                     inventory_hostname in groups[ 'private_nodes' ]
-  connection:               local
+  when:                       inventory_hostname in groups[ 'private_nodes' ]
+  connection:                 local
   os_port:
-    cloud:                  "{{ os_cloud_name }}"
-    state:                  present
-    name:                   "{{ openstack_ports[ 0 ].id }}"
+    cloud:                    "{{ os_cloud_name }}"
+    state:                    present
+    name:                     "{{ openstack_ports[ 0 ].id }}"
     allowed_address_pairs:
-      - ip_address:         "0.0.0.0/0"
-    #security_groups:        "{{ playbook_name }}-public-secgroup"
-
-
+      - ip_address:           "0.0.0.0/0"
+    #security_groups:         "{{ playbook_name }}-public-secgroup"
 
 - name: enforce router node to masquerade private node traffic
-  when:                     inventory_hostname == router_host
-  become: yes
+  when:                       inventory_hostname == router_host
+  become:                     yes
   iptables:
-    table:                  nat
-    chain:                  POSTROUTING
-    out_interface:          ens3
-    jump:                   MASQUERADE
-    comment:                Masquerade private node ip traffic
+    table:                    nat
+    chain:                    POSTROUTING
+    out_interface:            ens3
+    jump:                     MASQUERADE
+    comment:                  Masquerade private node ip traffic
 
 
 - name: enforce router node to forward inbound traffic of private nodes
-  when:                     inventory_hostname == router_host
-  become: yes
+  when:                       inventory_hostname == router_host
+  become:                     yes
   iptables:
-    chain:                  FORWARD
-    in_interface:           ens3
-    out_interface:          ens4
-    ctstate:                ESTABLISHED,RELATED
-    jump:                   ACCEPT
-    comment:                Forward inbound traffice to private node
+    chain:                    FORWARD
+    in_interface:             ens3
+    out_interface:            ens4
+    ctstate:                  ESTABLISHED,RELATED
+    jump:                     ACCEPT
+    comment:                  Forward inbound traffice to private node
 
 - name: enforce router node to forward traffic from private node to the Internet
-  when:                     inventory_hostname == router_host
-  become: yes
+  when:                       inventory_hostname == router_host
+  become:                     yes
   iptables:
-    chain:                  FORWARD
-    in_interface:           ens4
-    out_interface:          ens3
-    jump:                   ACCEPT
-    comment:                Forward outbound traffic to the internet
+    chain:                    FORWARD
+    in_interface:             ens4
+    out_interface:            ens3
+    jump:                     ACCEPT
+    comment:                  Forward outbound traffic to the internet
 
 - name: enforce ip forward on router node
-  when:                     inventory_hostname == router_host
+  when:                       inventory_hostname == router_host
   sysctl:
-    name:                   net.ipv4.ip_forward
-    value:                  1
-    sysctl_set:             yes
+    name:                     net.ipv4.ip_forward
+    value:                    1
+    sysctl_set:               yes
 
 
 - name: enforce private nodes to use router node as default gateway
-  when:                     inventory_hostname in groups[ 'private_nodes' ]
-  become:                   yes
-  ignore_errors:            yes
-  failed_when:              false
-  command:                  "route add default gw {{ router_host_privateip }}"
+  when:                       inventory_hostname in groups[ 'private_nodes' ]
+  become:                     yes
+  ignore_errors:              yes
+  failed_when:                false
+  command:                    "route add default gw {{ router_host_privateip }}"
 
 - name: delete old default gateway in private nodes
-  when:                     inventory_hostname in groups[ 'private_nodes' ]
-  become:                   yes
-  ignore_errors:            yes
-  failed_when:              false
-  command:                  "route del default gw {{ os_cloud_privatesubnet_gateway }}"
+  when:                       inventory_hostname in groups[ 'private_nodes' ]
+  become:                     yes
+  ignore_errors:              yes
+  failed_when:                false
+  command:                    "route del default gw {{ os_cloud_privatesubnet_gateway }}"
 
-- name: enforce private node to use Google DNS
-  when:                     inventory_hostname in groups[ 'private_nodes' ]
-  become:                   yes
-  blockinfile:
-    create:                 yes
-    state:                  present
-    dest:                   /etc/resolv.conf
-    insertafter:            EOF
-    block:  |
-                            nameserver 8.8.8.8
-                            nameserver 8.8.4.4
+##this is now enforced directly through the private subnet configuration
+# - name: enforce private node to use local DNS
+#   when:                       inventory_hostname in groups[ 'private_nodes' ]
+#   become:                     yes
+#   blockinfile:
+#     create:                   yes
+#     state:                    present
+#     dest:                     /etc/resolv.conf
+#     insertafter:              EOF
+#     block:  |
+#                               nameserver {{ global_dns_server_1 }}
+#                               nameserver {{ global_dns_server_2 }}

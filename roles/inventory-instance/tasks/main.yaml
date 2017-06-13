@@ -63,6 +63,7 @@
     remote_ip_prefix:             "{{ os_cloud_privatesubnet_cidr }}"
 
 - name: ensure public-facing nodes are up
+  no_log:                         true
   os_server:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
@@ -83,6 +84,7 @@
     #security_groups:             "{{ playbook_name }}-public-secgroup"
 
 - name: wait until SSH is available for public nodes
+  no_log:                         true
   local_action:
     module:                       wait_for
     host:                         "{{ item[ 'openstack' ][ 'networks' ][ os_cloud_publicnetwork_name ][ 0 ] }}"
@@ -93,6 +95,7 @@
   with_items:                     "{{ created_public_os_instances.results }}"
 
 - name: finding public-facing port of public nodes
+  no_log:                         true
   os_port_facts:
     cloud:                        "{{ os_cloud_name }}"
     filters:
@@ -103,6 +106,7 @@
   register:                       public_ports
 
 - name: assign security group to public-facing interface of public nodes
+  no_log:                         true
   os_port:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
@@ -111,6 +115,7 @@
   with_items:                     "{{ public_ports.results }}"
 
 - name: refresh inventory with newly created public-facing nodes
+  no_log:                         true
   add_host:
     name:                         "{{ item.server.id }}"
     groups:                       "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},public_nodes"
@@ -135,7 +140,19 @@
     os_instancename_prefix:       ''
   with_items:                     "{{ created_public_os_instances.results }}"
 
+- name:                           forcing local DNS attribution on private subnet
+  os_subnet:
+    cloud:                        "{{ os_cloud_name }}"
+    state:                        present
+    network_name:                 "{{ os_cloud_privatenetwork_name }}"
+    name:                         "{{ os_cloud_privatesubnet_id }}"
+    cidr:                         "{{ os_cloud_privatesubnet_cidr }}"
+    dns_nameservers:
+       - "{{ global_dns_server_1 }}"
+       - "{{ global_dns_server_2 }}"
+
 - name: ensure private instance are up
+  no_log:                         true
   os_server:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
@@ -153,6 +170,7 @@
   with_sequence:                  count="{{ private_node_number | int }}"
 
 - name: refresh inventory with newly created private nodes
+  no_log:                         true
   add_host:
     name:                         "{{ item.server.id }}"
     groups:                       "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},private_nodes"

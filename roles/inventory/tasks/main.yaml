@@ -78,6 +78,7 @@
     os_cloud_privatesubnet_gateway: "{{ openstack_subnets[ 0 ].gateway_ip }}"
 
 - name: adding existing OpenStack instance to its groups
+  no_log:                         true
   add_host:
     name:                         "{{ item.id }}"
     groups:                       "{{ item.metadata.groups }}"
