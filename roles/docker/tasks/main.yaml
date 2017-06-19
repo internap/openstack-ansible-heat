@@ -6,15 +6,6 @@
     keyserver:        hkp://keyserver.ubuntu.com:80
     id:               58118E89F3A912897C070ADBF76221572C52609D
 
-# - name: add key server on private host
-#   when:               groups[ 'private_nodes' ] is defined and inventory_hostname in groups[ 'private_nodes' ]
-#   apt_key:
-#     keyserver:        hkp://keyserver.ubuntu.com:80
-#     id:               58118E89F3A912897C070ADBF76221572C52609D
-#    environment:
-#      http_proxy:       "http://{{ proxy_host_privateip }}:{{ proxy_http_port }}"
-#      https_proxy:      "https://{{ proxy_host_privateip }}:{{ proxy_http_port }}"
-
 - name: add docker repository
   apt_repository:
     repo:             deb https://apt.dockerproject.org/repo ubuntu-xenial main
@@ -142,6 +133,11 @@
 #                       export HTTP_PROXY="http://{{ proxy_host_privateip }}:{{ proxy_http_port }}/"
 #                       export HTTPS_PROXY="https://{{ proxy_host_privateip }}:{{ proxy_http_port }}/"
 
+- name: add Docker Registry to group 'registry'
+  when:               groups[ 'private_nodes' ] is defined and inventory_hostname in groups[ 'private_nodes' ]
+  add_host:
+     name:            inventory_hostname
+     groups:          docker_nodes
 
 - name: reload dockerd configuration
   when:               groups[ 'private_nodes' ] is defined and inventory_hostname in groups[ 'private_nodes' ]

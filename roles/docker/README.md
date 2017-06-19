@@ -1,4 +1,4 @@
-### An ansible AND heat template to install and manage Docker installation (latest)
+### An ansible template to install and manage Docker installation (latest)
 
 See [the main documentation](/) for installation instruction and details.
 

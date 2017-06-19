@@ -1,6 +1,25 @@
 ---
 # Playbook to ensure a docker trusted registry is installed and configured correctly
 
+- name: share Docker Registry hostname play-wide if there is at least one private nodes
+  when:                                 private_node_number > 0
+  set_fact:
+    os_docker_registry:                 "{{ groups[ 'private_nodes' ][ ( private_node_number | int ) - 1 ] }}"
+
+- name: share Docker Registry hostname play-wide if there is only public nodes
+  when:                                 private_node_number == 0
+  set_fact:
+    os_docker_registry:                 "{{ groups[ 'public_nodes' ][ ( public_node_number | int ) - 1 ] }}"
+
+- name: add Docker Registry to group 'registry'
+  add_host:
+     name:                              os_docker_registry
+     groups:                            docker_registry_node
+
+- name: share private IP of Docker Registry
+  set_fact:
+    os_docker_registry_ip:              "{{ hostvars[ os_docker_registry ].privateIPv4 }}"
+
 - name: get your cloud authentication info to push to the Docker Registry swift storage driver
   connection:                           local
   os_client_config:
@@ -15,20 +34,6 @@
   set_fact:
     os_auth_region_name:                "{{ openstack.clouds[ 0 ].region_name }}"
 
-- name: share Docker Registry hostname play-wide if there is at least one private nodes
-  when:                                 private_node_number > 0
-  set_fact:
-    os_docker_registry:                 "{{ groups[ 'private_nodes' ][ ( private_node_number | int ) - 1 ] }}"
-
-- name: share Docker Registry hostname play-wide if there is only public nodes
-  when:                                 private_node_number == 0
-  set_fact:
-    os_docker_registry:                 "{{ groups[ 'public_nodes' ][ ( public_node_number | int ) - 1 ] }}"
-
-- name: share private IP of Docker Registry
-  set_fact:
-    os_docker_registry_ip:              "{{ hostvars[ os_docker_registry ].privateIPv4 }}"
-
 - name: ensure Docker Registry is up
   when:                                 inventory_hostname == os_docker_registry
   docker_container:
@@ -41,6 +46,8 @@
     - "5000:5000"
     env:
       REGISTRY_STORAGE:                 swift
+      REGISTRY_HTTP_TLS_CERTIFICATE:    "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.crt"
+      REGISTRY_HTTP_TLS_KEY:            "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.key"
       REGISTRY_STORAGE_SWIFT_USERNAME:  "{{ os_auth_params.username }}"
       REGISTRY_STORAGE_SWIFT_PASSWORD:  "{{ os_auth_params.password }}"
       REGISTRY_STORAGE_SWIFT_AUTHURL:   "{{ os_auth_params.auth_url }}"

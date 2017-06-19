@@ -1,4 +1,4 @@
-### An ansible AND heat template to install and manage keepalived
+### An ansible template to install and manage keepalived
 
 See [the main documentation](/) for installation instruction and details.
 
