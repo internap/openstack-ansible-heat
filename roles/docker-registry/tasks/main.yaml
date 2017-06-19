@@ -1,17 +1,11 @@
 ---
 # Playbook to ensure a docker trusted registry is installed and configured correctly
 
-- name: share Docker Registry hostname play-wide if there is at least one private nodes
-  when:                                 private_node_number > 0
-  set_fact:
-    os_docker_registry:                 "{{ groups[ 'private_nodes' ][ ( private_node_number | int ) - 1 ] }}"
+- name: we've choose the instance
+  run_once:                             true
+  debug:                                msg="{{ os_docker_registry }} to be the Docker Registry"
 
-- name: share Docker Registry hostname play-wide if there is only public nodes
-  when:                                 private_node_number == 0
-  set_fact:
-    os_docker_registry:                 "{{ groups[ 'public_nodes' ][ ( public_node_number | int ) - 1 ] }}"
-
-- name: add Docker Registry to group 'registry'
+- name: add Docker Registry to group 'docker_registry_node'
   add_host:
      name:                              os_docker_registry
      groups:                            docker_registry_node
@@ -19,6 +13,14 @@
 - name: share private IP of Docker Registry
   set_fact:
     os_docker_registry_ip:              "{{ hostvars[ os_docker_registry ].privateIPv4 }}"
+
+- name: share full adress of Docker Registry
+  set_fact:
+    os_docker_registry_fullname:        "{{ os_docker_registry_ip }}{{ ( ( registry_public_port | int ) == 443 ) | ternary( '', ':' + ( registry_public_port | string ) ) }}"
+
+- name: show it
+  debug:
+    msg: "{{ os_docker_registry_fullname }}"
 
 - name: get your cloud authentication info to push to the Docker Registry swift storage driver
   connection:                           local
@@ -42,12 +44,14 @@
     state:                              started
     pull:                               true
     restart_policy:                     always
+    volumes:
+      - "{{ certs_directory }}:/certs"
     ports:
-    - "5000:5000"
+      - "{{ registry_public_port }}:{{ registry_private_port }}"
     env:
       REGISTRY_STORAGE:                 swift
-      REGISTRY_HTTP_TLS_CERTIFICATE:    "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.crt"
-      REGISTRY_HTTP_TLS_KEY:            "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.key"
+      REGISTRY_HTTP_TLS_CERTIFICATE:    "certs/{{ playbook_name }}-{{ inventory_hostname }}.crt"
+      REGISTRY_HTTP_TLS_KEY:            "certs/{{ playbook_name }}-{{ inventory_hostname }}.key"
       REGISTRY_STORAGE_SWIFT_USERNAME:  "{{ os_auth_params.username }}"
       REGISTRY_STORAGE_SWIFT_PASSWORD:  "{{ os_auth_params.password }}"
       REGISTRY_STORAGE_SWIFT_AUTHURL:   "{{ os_auth_params.auth_url }}"
@@ -56,23 +60,25 @@
       REGISTRY_STORAGE_SWIFT_REGION:    "{{ os_auth_region_name }}"
       REGISTRY_STORAGE_SWIFT_CONTAINER: "{{ playbook_name }}"
       REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY: yes
-#
-# - name: ensure Docker Registry is up
-#   when:                   inventory_hostname == os_docker_registry
-#   command:                "docker run -d -p 5000:5000 --restart=always --name registry \
-#                              -e REGISTRY_STORAGE=swift \
-#                              -e REGISTRY_STORAGE_SWIFT_USERNAME={{ os_auth_params.username }} \
-#                              -e REGISTRY_STORAGE_SWIFT_PASSWORD={{ os_auth_params.password }} \
-#                              -e REGISTRY_STORAGE_SWIFT_AUTHURL={{ os_auth_params.auth_url }} \
-#                              -e REGISTRY_STORAGE_SWIFT_TENANT={{ os_auth_params.project_name }} \
-#                              -e REGISTRY_STORAGE_SWIFT_DOMAIN={{ os_auth_params.project_domain_name }} \
-#                              -e REGISTRY_STORAGE_SWIFT_REGION={{ os_auth_region_name }} \
-#                              -e REGISTRY_STORAGE_SWIFT_CONTAINER={{ playbook_name }} \
-#                              -e REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY=yes \
-#                              registry:2"
-#   register:                 docker_registry_up
-#   until:                    docker_registry_up|success
-#   retries:                  3
-#   delay:                    20
-#   ignore_errors:            yes
-#   become:                   yes
+
+- name: fetch Docker Registry certificate
+  run_once:                             true
+  delegate_to:                          "{{ os_docker_registry }}"
+  fetch:
+    flat:                               yes
+    src:                                "{{ certs_directory }}{{ playbook_name }}-{{ os_docker_registry }}.crt"
+    dest:                               config/data/
+
+- name: ensure Docker Registry config directory exists
+  when:                                 inventory_hostname != os_docker_registry
+  file:
+    mode:                               0755
+    state:                              directory
+    path:                               "/etc/docker/certs.d/{{ os_docker_registry_fullname }}"
+
+- name: copy Docker Registry certificate to client nodes
+  when:                                 inventory_hostname != os_docker_registry
+  copy:
+    directory_mode:                     0755
+    src:                                "config/data/{{ playbook_name }}-{{ os_docker_registry }}.crt"
+    dest:                               "/etc/docker/certs.d/{{ os_docker_registry_fullname }}/ca.crt"

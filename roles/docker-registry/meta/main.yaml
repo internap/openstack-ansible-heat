@@ -1,4 +1,4 @@
 ---
 dependencies:
-   - docker
-   - { role: certs-ssl, when: inventory_hostname == 'Darwin' }
+  - docker
+  - { role: sslcerts, when: inventory_hostname == os_docker_registry }

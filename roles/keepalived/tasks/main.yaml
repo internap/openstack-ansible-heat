@@ -4,9 +4,9 @@
 - include_vars:
     file:                         roles/inventory/defaults/main.yaml
 
-- name: set virtual routeur ID
-  set_fact:
-    virtualrouter_id:             "{{ groups[ 'public_nodes' ][ 0 ] }}"
+- name: we've choosen the instance
+  run_once:                             true
+  debug:                                msg="{{ virtualrouter_id }} to be Virtual Router"
 
 - name: build ip pairs array
   set_fact:

@@ -57,8 +57,6 @@
     - { role: inventory,          when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     - { role: meta-bastion,       when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     - { role: meta-router,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    ## proxy meta role is replaced by router
-    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 - name: "____________________ Meta-roles remote execution  ______________________"
   hosts:                          "{{ playbook_name }}"
@@ -71,8 +69,6 @@
     - { role: inventory,          when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     - { role: meta-bastion,       when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     - { role: meta-router,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    ## proxy meta role is replaced by router
-    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 
 
@@ -83,5 +79,5 @@
   vars_files:
     - config/openstack-config.yaml
   roles:
-    - { role: inventory }
+    - inventory
     - "{{ role }}"

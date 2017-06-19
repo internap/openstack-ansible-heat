@@ -1,9 +1,9 @@
 ---
 # Playbook to ensure docker swarm is installed and configured correctly
 
-- name: share Docker Swarm Leader hostname play-wide
-  set_fact:
-    os_swarm_lead:    "{{ groups[ 'public_nodes' ][ 0 ] }}"
+- name: we've choosen the instance
+  run_once:                             true
+  debug:                                msg="{{ os_swarm_lead }} to be the Swarm Leader"
 
 - name: share public IP as Docker Swarm leader (hosts are public)
   set_fact:

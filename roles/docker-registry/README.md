@@ -3,7 +3,7 @@
 See [the main documentation](/) for installation instruction and details.
 
 + ![Progress](http://progressed.io/bar/100)   (Ubuntu) Docker Registry installation and configuration
-+ ![Progress](http://progressed.io/bar/80)    (Ubuntu) Security hardnessing
++ ![Progress](http://progressed.io/bar/80)    (Ubuntu) Security hardening
 
 ## What does it do ?
 Adding to the basic workload features, this template/recipe add the installation
@@ -28,6 +28,10 @@ docker on them.
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=docker-registry -e node_count=4
   ```
+
+### Optional parameters:
+  * ssl_key_filename= the custom registry key to use
+  * ssl_cert_filename= the custom registry certificate to use
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!
