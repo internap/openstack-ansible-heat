@@ -2,23 +2,27 @@
 # Playbook to ensure docker is installed
 
 - name: ensure certifate directory exists
+  when:               ssl_instance is undefined or ( ssl_instance is defined and inventory_hostname in ssl_instance )
   file:
     path:             {{ certs_directory }}
     state:            directory
     mode:             0700
 
 - name: checking if ssl key exists
+  when:               ssl_instance is undefined or ( ssl_instance is defined and inventory_hostname in ssl_instance )
   stat:
     path:             "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.key"
   register:           privatekey_exist
 
 
 - name: checking if private CSR exists
+  when:               ssl_instance is undefined or ( ssl_instance is defined and inventory_hostname in ssl_instance )
   stat:
     path:             "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.crt"
   register:           csr_exist
 
 - name: if not, generate private key and CSR
+  when:               ssl_instance is undefined or ( ssl_instance is defined and inventory_hostname in ssl_instance )
   when:               privatekey_exist.stat.exists == False or csr_exist.stat.exists == False
   shell:              "openssl req -newkey rsa:4096 -nodes -sha256
                         -keyout {{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.key \
