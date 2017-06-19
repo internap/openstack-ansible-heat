@@ -40,8 +40,8 @@
     - "roles/{{ role }}/defaults/main.yaml"
   roles:
     - { role: inventory,          when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
-    - { role: inventory-keys,     when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
-    - { role: inventory-instance, when: "action is undefined or ( action != 'local' and 'delete' not in action )" }
+    - { role: inventory-keys,     when: "action is undefined or ( action != 'skip_setup' and 'delete' not in action )" }
+    - { role: inventory-instance, when: "action is undefined or ( action != 'skip_setup' and 'delete' not in action )" }
 
 
 
@@ -54,11 +54,11 @@
     - config/openstack-config.yaml
     - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    - { role: meta-router,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-router,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     ## proxy meta role is replaced by router
-    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 - name: "____________________ Meta-roles remote execution  ______________________"
   hosts:                          "{{ playbook_name }}"
@@ -68,11 +68,11 @@
     - config/openstack-config.yaml
     - "roles/{{ role }}/defaults/main.yaml"
   roles:
-    - { role: inventory,          when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    - { role: meta-bastion,       when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
-    - { role: meta-router,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: inventory,          when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-bastion,       when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    - { role: meta-router,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
     ## proxy meta role is replaced by router
-    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'local' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
+    #- { role: meta-proxy,         when: "( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) ) and ( private_node_number > 0 )" }
 
 
 

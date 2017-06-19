@@ -3,7 +3,8 @@
 
 It currently fully support the following workload:
 + ![Progress](http://progressed.io/bar/100)   [docker](/roles/docker) - A basic docker installation
-+ ![Progress](http://progressed.io/bar/100)   [docker-swarm](/roles/docker-swarm) - A swarm installation (using latest swarm version)
++ ![Progress](http://progressed.io/bar/100)   [docker-swarm](/roles/docker-swarm) - A swarm installation (using latest docker version)
++ ![Progress](http://progressed.io/bar/100)   [docker-registry](/roles/docker-registry) - A docker registry installation (using latest docker version)
 + ![Progress](http://progressed.io/bar/100)   [stable-docker](/roles/stable-docker)  - The current stable version of docker installation
 + ![Progress](http://progressed.io/bar/20)    [ha-docker-swarm](/roles/ha-docker-swarm) - A high-availability docker swarm installation
 + ![Progress](http://progressed.io/bar/40)    [keepalived](/roles/keepalived) - A high-availability basic keepalived setup
@@ -70,7 +71,7 @@ through the local customer-specific network
         * BEWARE : If you did but don't remember them, clicking that button will regenerate new credentials and expire the old one, blocking any other access with them, including any application that would use those old credentials
         * When you click the button, simply copy and paste both information into your clouds.yaml file, do not forget to store those credentials somewhere where you can retrieve them later
 
-  3. Adapt your Openstack config file to your account:
+  3. Adapt your Openstack config file to your account and your needs:
     ```
     cat config/openstack-config.yaml
     ```    
@@ -80,14 +81,7 @@ through the local customer-specific network
           image_name:         Ubuntu 16.04 LTS (Xenial Xerus)    #this is the OS image we'll be using
           flavor_name:        A1.1                               #this is the default flavor we'll be using
           controller_flavor:  A1.1                               #this is the flavor we'll be using for 'controller' node (see specifif role for details)
-          network_wan:        inap-18000-WAN1110                 #this is the WAN network name that was given to you
-          network_lan:        inap-18000-LAN2011                 #this is the LAN network name that was given to you
       ```
-
-      * To find your WAN and LAN
-        * Go your Horizon portal ([horizon.internap.com](https://horizon.internap.com)),
-        * Click the 'Network > Networks' tab in the menu on the left
-        * Copy and paste the full name displayed in the 'Name' column,the format should be <YOURPROJECTNAME>-WANXXXX
 
 5. You can now launch the Ansible playbook using :
   ```bash
@@ -101,6 +95,7 @@ through the local customer-specific network
  - delete: the script will then delete all existing instances
  - delete_all: the script will delete instance, local config files and keys in OS
  - delete_all_includinguserkey: the script will wipe keys and instances both in OS and locally
+ - skip_setup: the script will execute only the docker role and it's dependencies and skip all creation and setup of instance 
 * key_filename= explicit SSH key file name to use
 
 ##### Which would mean, for a 4 node docker swarm cluster using a shared ssh key stored in /tmp/blabla:

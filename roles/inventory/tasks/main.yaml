@@ -8,26 +8,31 @@
     server:                       "{{ os_instancename_prefix }}*"
   register:                       gathered_os_instance_list
 
-- name: refresh inventory after OpenStack inventory gathering
-  meta: refresh_inventory
-
-- name: gather public network (WAN) information
+- name: gather networks (LAN and WAN) information
+  no_log:                         true
   connection:                     local
   os_networks_facts:
     cloud:                        "{{ os_cloud_name }}"
-    name:                         "{{ os_cloud_publicnetwork_name }}"
+
+- name: store public network (WAN) information
+  no_log:                         true
+  connection:                     local
+  with_items:                     "{{ openstack_networks }}"
+  when:                           "'WAN' in item.name"
+  set_fact:
+    os_cloud_publicnetwork:       "{{ item }}"
 
 - name: store public network (WAN) name
   set_fact:
-    os_cloud_publicnetwork_name:  "{{ openstack_networks[ 0 ].name }}"
+    os_cloud_publicnetwork_name:  "{{ os_cloud_publicnetwork.name }}"
 
 - name: store public network (WAN) ID
   set_fact:
-    os_cloud_publicnetwork_id:   "{{ openstack_networks[ 0 ].id }}"
+    os_cloud_publicnetwork_id:   "{{ os_cloud_publicnetwork.id }}"
 
 - name: store public subnet (WAN) ID
   set_fact:
-    os_cloud_publicsubnet_id:     "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
+    os_cloud_publicsubnet_id:     "{{ os_cloud_publicnetwork.subnets[ 0 ] }}"
 
 - name: gather facts about the public network (WAN) subnets
   connection:                     local
@@ -44,23 +49,25 @@
   set_fact:
     os_cloud_publicsubnet_gateway: "{{ openstack_subnets[ 0 ].gateway_ip }}"
 
-- name: gather private network (LAN) information
+- name: store private network (LAN) information
+  no_log:                         true
   connection:                     local
-  os_networks_facts:
-    cloud:                        "{{ os_cloud_name }}"
-    name:                         "{{ os_cloud_privatenetwork_name }}"
+  with_items:                     "{{ openstack_networks }}"
+  when:                           "'LAN' in item.name"
+  set_fact:
+    os_cloud_privatenetwork:      "{{ item }}"
 
 - name: store private network (LAN) name
   set_fact:
-    os_cloud_privatenetwork_name:  "{{ openstack_networks[ 0 ].name }}"
+    os_cloud_privatenetwork_name:  "{{ os_cloud_privatenetwork.name }}"
 
 - name: store private network (LAN) ID
   set_fact:
-    os_cloud_privatenetwork_id:   "{{ openstack_networks[ 0 ].id }}"
+    os_cloud_privatenetwork_id:   "{{ os_cloud_privatenetwork.id }}"
 
 - name: store private subnet (LAN) ID
   set_fact:
-    os_cloud_privatesubnet_id:    "{{ openstack_networks[ 0 ].subnets[ 0 ] }}"
+    os_cloud_privatesubnet_id:    "{{ os_cloud_privatenetwork.subnets[ 0 ] }}"
 
 - name: gather facts about the private network (LAN) subnets
   connection:                     local
@@ -87,7 +94,9 @@
     os_key_name:                  "{{ item.metadata.key_name }}"
     os_instance_tags:             "{{ item.metadata.tags }}"
     ansible_ssh_host:             "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( item.networks[ os_cloud_privatenetwork_name ][ 0 ] ) }}"
-    openstack.accessIPv4:         "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
+    openstack:
+      interface_ip:               "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( item.networks[ os_cloud_privatenetwork_name ][ 0 ] ) }}"
+      accessIPv4:                 "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( item.networks[ os_cloud_privatenetwork_name ][ 0 ] ) }}"
     public_v4:                    "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
     private_v4:                   "{{ ( item.networks[ os_cloud_privatenetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
     publicIPv4:                   "{{ ( item.networks[ os_cloud_publicnetwork_name ] | default( [] ) )[ 0 ] | default( '' ) }}"
