@@ -4,6 +4,7 @@ See [the main documentation](/) for installation instruction and details.
 
 + ![Progress](http://progressed.io/bar/0)     (Ubuntu) HA installation and config
 + ![Progress](http://progressed.io/bar/0)     (Ubuntu) Security hardening
++ ![Progress](http://progressed.io/bar/0)     (Ubuntu) High-availability (redundancy, backup and monitoring)
 
 ## What does it do ?
 Adding to the docker-swarm workload features, this template/recipe add high
