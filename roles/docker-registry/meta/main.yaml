@@ -1,4 +1,4 @@
 ---
 dependencies:
   - docker
-  - { role: sslcerts, when: inventory_hostname == os_docker_registry }
+  - { role: certs-authority, when: inventory_hostname == os_docker_registry }

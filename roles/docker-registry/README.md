@@ -30,8 +30,11 @@ docker on them.
   ```
 
 ### Optional parameters:
-  * ssl_key_filename= the custom registry key to use
-  * ssl_cert_filename= the custom registry certificate to use
+  * ca_privatekey_filepath= the custom Certificate Authority private key to use
+  * ca_publickey_filepath= the custom Certificate Authority public key to use
+  * server_privatekey_filepath= the custom registry key to use
+  * server_csr_filepath= the custom Certificate Request file to use
+  * server_publickey_filepath= the custom registry certificate to use
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!

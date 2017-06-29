@@ -22,6 +22,7 @@
   connection:                     local
   hosts:                          localhost
   vars:
+    master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
   vars_files:
     - config/openstack-config.yaml
@@ -34,6 +35,7 @@
   connection:                     local
   hosts:                          localhost
   vars:
+    master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
   vars_files:
     - config/openstack-config.yaml
@@ -49,6 +51,7 @@
   connection:                     local
   hosts:                          localhost
   vars:
+    master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
   vars_files:
     - config/openstack-config.yaml
@@ -61,6 +64,7 @@
 - name: "____________________ Meta-roles remote execution  ______________________"
   hosts:                          "{{ playbook_name }}"
   vars:
+    master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
   vars_files:
     - config/openstack-config.yaml
@@ -75,6 +79,7 @@
 - name:  "______________________ {{ role }} role execution ______________________"
   hosts:                          "{{ playbook_name }}"
   vars:
+    master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
   vars_files:
     - config/openstack-config.yaml
