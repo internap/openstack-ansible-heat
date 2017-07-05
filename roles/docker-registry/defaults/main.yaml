@@ -1,8 +1,7 @@
 #node counting and balancing
 node_number:                    "{{ node_count                          | default( 2 ) }}"
-private_node_number:            "{{ ( private_node_count is defined )   | ternary( private_node_count,  1  ) }}"
-public_node_number:             "{{ ( public_node_count is defined )    | ternary( public_node_count,   ( node_number | int ) - ( private_node_number | int ) ) }}"
-
+public_node_number:             "{{ ( public_node_count is defined )    | ternary( public_node_count,   ( private_node_count is defined ) | ternary( ( node_number | int ) - ( private_node_count | int ), node_number ) ) }}"
+private_node_number:            "{{ ( private_node_count is defined )   | ternary( private_node_count,  ( node_number | int ) - ( public_node_number | int ) ) }}"
 
 os_docker_registry_idx:         "{{ ( private_node_number > 0 ) | ternary( ( private_node_number | int ) - 1, ( public_node_number | int ) - 1 ) }}"
 os_docker_registry:             "{{ ( private_node_number > 0 ) | ternary( groups[ 'private_nodes' ][ os_docker_registry_idx | int ], groups[ 'public_nodes' ][ os_docker_registry_idx | int ] ) }}"
