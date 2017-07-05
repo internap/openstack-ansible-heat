@@ -8,8 +8,9 @@ See [the main documentation](/) for installation instruction and details.
 
 ## What does it do ?
 Adding to the basic workload features, this template/recipe add the installation
-and configuration of a Docker Swarm. All 'public' nodes will be elected as Leader
-in the swarm, all 'private' nodes will be 'slaves'.
+and configuration of a Docker Swarm. All 'public' nodes will be elected as Managers
+in the swarm, all 'private' nodes will be Workers. The first public node will be
+elected as the default Leader of the swarm.
 
 ### Private / public nodes split
 - If don't specify the public_node_count parameters during the deployment, we will
@@ -26,6 +27,9 @@ the internet unless you go through the ssh bastion server.
   ```bash
   ./openstack-ansible -e os_cloud=<MY_CLOUDS_YAML_PROFILE> -e role=docker-swarm -e node_count=4
   ```
+
+  ### Optional parameters:
+    * ha= true or false (default is true) to disable High-availability using the keepalived role
 
 # Contributing
 Feel free to raise issues and send some pull request, we'll be happy to look at them!

@@ -72,7 +72,7 @@
   delegate_to:                          "{{ os_docker_registry }}"
   fetch:
     flat:                               yes
-    src:                                "{{ certs_directory }}{{ playbook_name }}-{{ os_docker_registry }}-server.publickey.crt"
+    src:                                "{{ certs_directory }}{{ playbook_name }}-{{ os_docker_registry }}-CA.publickey.crt"
     dest:                               config/data/
 
 - name: ensure Docker Registry config directory exists
@@ -82,8 +82,7 @@
     path:                               "/etc/docker/certs.d/{{ os_docker_registry_fullname }}"
 
 - name: copy Docker Registry certificate to client nodes
-  when:                                 inventory_hostname != os_docker_registry
   copy:
     directory_mode:                     0755
-    src:                                "config/data/{{ playbook_name }}-{{ os_docker_registry }}-server.publickey.crt"
+    src:                                "config/data/{{ playbook_name }}-CA.publickey.crt"
     dest:                               "/etc/docker/certs.d/{{ os_docker_registry_fullname }}/ca.crt"

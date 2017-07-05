@@ -1,6 +1,0 @@
----
-# Playbook to ensure docker swarm is installed, configured and highly available
-
-- name: we've choosen the instance
-  run_once:                             true
-  debug:                                msg="{{ os_swarm_lead }} to be the Swarm Leader"
