@@ -1,17 +1,25 @@
 ---
 # Playbook to instanciate an OpenStack instance
 
+- name: we currently have
+  debug:
+    msg:                          "{{ ( groups[ master_role + '-public_nodes' ] | default( [] ) ) | length }} public nodes and {{ ( groups[ master_role + '-private_nodes' ] | default( [] ) ) | length }} private nodes"
+
+- name: we need to have
+  debug:
+    msg:                          "{{ public_node_number }} public nodes and {{ private_node_number }} private nodes"
+
 - name: ensure security group for public facing nodes exists
   os_security_group:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
-    name:                         "{{ playbook_name }}-public-secgroup"
-    description:                  "security group for public {{ playbook_name }} servers"
+    name:                         "{{ master_role }}-public-secgroup"
+    description:                  "security group for public {{ master_role }} servers"
 
 - name: ensure HTTP is allowed from anywhere for public nodes in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     tcp
     port_range_min:               80
     port_range_max:               80
@@ -20,7 +28,7 @@
 - name: ensure HTTPS is allowed from anywhere for public nodes in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     tcp
     port_range_min:               443
     port_range_max:               443
@@ -29,7 +37,7 @@
 - name: ensure SSH is allowed from anywhere for public nodes in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     tcp
     port_range_min:               22
     port_range_max:               22
@@ -38,7 +46,7 @@
 - name: ensure all TCP is allowed from private network to the public interface in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     tcp
     port_range_min:               1
     port_range_max:               65535
@@ -47,7 +55,7 @@
 - name: ensure all UDP is allowed from private network to the public interface in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     udp
     port_range_min:               1
     port_range_max:               65535
@@ -56,18 +64,30 @@
 - name: ensure all ICMP is allowed from private network to the public interface in public-secgroup
   os_security_group_rule:
     cloud:                        "{{ os_cloud_name }}"
-    security_group:               "{{ playbook_name }}-public-secgroup"
+    security_group:               "{{ master_role }}-public-secgroup"
     protocol:                     icmp
     port_range_min:               1
     port_range_max:               255
     remote_ip_prefix:             "{{ os_cloud_privatesubnet_cidr }}"
+
+- set_fact:
+    public_cleanup_count:           "{{ ( ( ( groups[ master_role + '-public_nodes' ] | default( [] ) ) | length ) - ( public_node_number | int ) > 0 ) | ternary( ( ( groups[ master_role + '-public_nodes' ] | default( [] ) ) | length ) - ( public_node_number | int ), 0 ) }}"
+
+- block:
+  - name: ensure extraneous public node are deleted
+    os_server:
+      cloud:                        "{{ os_cloud_name }}"
+      state:                        absent
+      name:                         "{{ os_instancename_prefix + 'publicnode' + ( public_node_number | int + item | int ) | string }}"
+    with_sequence:                count="{{ public_cleanup_count }}"
+  when:                           public_cleanup_count > 0
 
 - name: ensure public-facing nodes are up
   no_log:                         true
   os_server:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
-    name:                         "{{ os_instancename_prefix + item }}"
+    name:                         "{{ os_instancename_prefix + 'publicnode'+ item }}"
     image:                        "{{ os_cloud_image_name }}"
     key_name:                     "{{ os_key_name }}"
     flavor:                       "{{ os_cloud_flavor_name }}"
@@ -76,12 +96,12 @@
       - net-name:                 "{{ os_cloud_privatenetwork_name }}"
     meta:
       tags:                       "{{ os_instance_tags }}"
-      groups:                     "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},public_nodes"
+      groups:                     "ansible_nodes,{{ master_role }},meta-group_{{ os_instance_tags }},{{ master_role }}-public_nodes,public_nodes"
       key_name:                   "{{ os_key_name }}"
     wait:                         yes
   with_sequence:                  count="{{ public_node_number | int }}"
   register:                       created_public_os_instances
-    #security_groups:             "{{ playbook_name }}-public-secgroup"
+    #security_groups:             "{{ master_role }}-public-secgroup"
 
 - name: wait until SSH is available for public nodes
   no_log:                         true
@@ -111,14 +131,14 @@
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
     name:                         "{{ item.ansible_facts.openstack_ports[ 0 ].id }}"
-    security_groups:              "{{ playbook_name }}-public-secgroup"
+    security_groups:              "{{ master_role }}-public-secgroup"
   with_items:                     "{{ public_ports.results }}"
 
 - name: refresh inventory with newly created public-facing nodes
   no_log:                         true
   add_host:
     name:                         "{{ item.server.id }}"
-    groups:                       "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},public_nodes"
+    groups:                       "ansible_nodes,{{ master_role }},meta-group_{{ os_instance_tags }},{{ master_role }}-public_nodes,public_nodes"
     instance_name:                "{{ item.server.name }}"
     os_uuid:                      "{{ item.id }}"
     os_key_name:                  "{{ os_key_name }}"
@@ -152,19 +172,31 @@
        - "{{ global_dns_server_1 }}"
        - "{{ global_dns_server_2 }}"
 
+- set_fact:
+    private_cleanup_count:        "{{ ( ( ( groups[ master_role + '-private_nodes' ] | default( [] ) ) | length ) - ( private_node_number | int ) > 0 ) | ternary( ( ( groups[ master_role + '-private_nodes' ] | default( [] ) ) | length ) - ( private_node_number | int ), 0 ) }}"
+
+- block:
+  - name: ensure extraneous public node are deleted
+    os_server:
+      cloud:                        "{{ os_cloud_name }}"
+      state:                        absent
+      name:                         "{{ os_instancename_prefix + 'privatenode' + ( private_node_number | int + item | int ) | string }}"
+    with_sequence:                count="{{ private_cleanup_count }}"
+  when:                           private_cleanup_count > 0
+
 - name: ensure private instance are up
   #no_log:                         true
   os_server:
     cloud:                        "{{ os_cloud_name }}"
     state:                        present
-    name:                         "{{ os_instancename_prefix + ( item|int + public_node_number|int )|string }}"
+    name:                         "{{ os_instancename_prefix + 'privatenode' + ( item|int + private_node_number|int )|string }}"
     image:                        "{{ os_cloud_image_name }}"
     key_name:                     "{{ os_key_name }}"
     flavor:                       "{{ os_cloud_flavor_name }}"
     network:                      "{{ os_cloud_privatenetwork_name }}"
     meta:
       tags:                       "{{ os_instance_tags }}"
-      groups:                     "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},private_nodes"
+      groups:                     "ansible_nodes,{{ master_role }},meta-group_{{ os_instance_tags }},{{ master_role }}-private_nodes,private_nodes"
       key_name:                   "{{ os_key_name }}"
     wait:                         yes
   register:                       created_private_os_instances
@@ -174,7 +206,7 @@
   no_log:                         true
   add_host:
     name:                         "{{ item.server.id }}"
-    groups:                       "ansible_nodes,{{ playbook_name }},meta-group_{{ os_instance_tags }},private_nodes"
+    groups:                       "ansible_nodes,{{ master_role }},meta-group_{{ os_instance_tags }},{{ master_role }}-private_nodes,private_nodes"
     instance_name:                "{{ item.server.name }}"
     os_uuid:                      "{{ item.id }}"
     os_key_name:                  "{{ os_key_name }}"

@@ -62,7 +62,7 @@
     - { role: meta-router,        when: "( ( private_node_number | int ) > 0 ) and ( action is undefined or ( action != 'skip_setup' and 'delete' not in action ) )" }
 
 - name: "____________________ Meta-roles remote execution  ______________________"
-  hosts:                          "{{ playbook_name }}"
+  hosts:                          "{{ master_role }}"
   vars:
     master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
@@ -77,7 +77,7 @@
 
 
 - name:  "______________________ {{ role }} role execution ______________________"
-  hosts:                          "{{ playbook_name }}"
+  hosts:                          "{{ master_role }}"
   vars:
     master_role:                  "{{ role }}"
     playbook_name:                "{{ role }}-ansible"
