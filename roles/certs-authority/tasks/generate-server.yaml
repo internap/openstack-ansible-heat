@@ -1,6 +1,12 @@
 ---
 # Playbook to ensure docker is installed
 
+- name: ensure certificate directory exists
+  file:
+    path:             "{{ certs_directory }}"
+    state:            directory
+    mode:             0755
+
 - name: CA generate server keys - ensure we certify the right node
   set_fact:
     host_to_certify:  "{{ item | default( inventory_hostname ) }}"
@@ -8,7 +14,7 @@
 - name: ensure the openssl configuration is present
   blockinfile:
     create:           yes
-    dest:             "{{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.openssl.cnf"
+    dest:             "{{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.openssl.cnf"
     marker:           "#{mark} {{ playbook_name }}"
     block: |
                       [req]
@@ -22,9 +28,12 @@
                       subjectAltName = @alt_names
 
                       [alt_names]
-                      DNS.1 = docker.local
-                      IP.1 = {{ ansible_ssh_host }}
-                      IP.2 = 127.0.0.1
+                      {% for current_dnsname in server_dnsnames %}
+                      DNS.{{loop.index}} = {{ current_dnsname }}
+                      {% endfor %}
+                      IP.1 = 127.0.0.1
+                      {{ ( publicIPv4 is defined and publicIPv4 != '' ) | ternary( 'IP.2 = ' + privateIPv4, 'IP.2 = ' +  ansible_ssh_host ) }}
+                      {{ ( publicIPv4 is defined and publicIPv4 != '' ) | ternary( 'IP.3 = ' + ansible_ssh_host, '' ) }}
 
 ## private key management
 - name: CA generate server keys - upload server private key if it's passed as parameter server_privatekey_filepath=
@@ -32,16 +41,16 @@
   copy:
     directory_mode:   0755
     src:              "{{ server_privatekey_filepath }}"
-    dest:             "{{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.privatekey.key"
+    dest:             "{{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.privatekey.key"
 
 - name: CA generate server keys - checking if server private key exists
   stat:
-    path:             "{{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.privatekey.key"
+    path:             "{{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.privatekey.key"
   register:           server_privatekey_exist
 
 - name: CA generate server keys - generate server private key if it does not exist already
   when:               server_privatekey_exist.stat.exists == False
-  shell:              "openssl genrsa -out {{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.privatekey.key {{ key_size }}"
+  shell:              "openssl genrsa -out {{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.privatekey.key {{ key_size }}"
 
 ## Certificate Request management
 - name: CA generate server keys - upload Certificate Request if it's passed as parameter server_csr_filepath=
@@ -49,18 +58,18 @@
   copy:
     directory_mode:   0755
     src:              "{{ server_csr_filepath }}"
-    dest:             "{{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.csr"
+    dest:             "{{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.csr"
 
 - name: CA generate server keys - checking if Certificate Request exists
   stat:
-    path:             "{{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.csr"
+    path:             "{{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.csr"
   register:           server_csr_exist
 
 - name: CA generate server keys - generate Certificate Request if does not exist already
   when:               server_csr_exist.stat.exists == False
-  shell:              "openssl req -new -key {{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.privatekey.key \
-                        -out {{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.csr \
-                        -config {{ certs_directory }}{{ playbook_name }}-{{ host_to_certify }}-server.openssl.cnf \
+  shell:              "openssl req -new -key {{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.privatekey.key \
+                        -out {{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.csr \
+                        -config {{ certs_directory }}{{ master_role }}-{{ host_to_certify }}-server.openssl.cnf \
                         -subj '/CN={{ master_role }}-{{ host_to_certify | md5 }}-server'"
 
 - name: CA generate server keys - generate the Server certificate

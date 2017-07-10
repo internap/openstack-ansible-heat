@@ -65,7 +65,7 @@
     name:                     "{{ openstack_ports[ 0 ].id }}"
     allowed_address_pairs:
       - ip_address:           "0.0.0.0/0"
-    #security_groups:         "{{ playbook_name }}-public-secgroup"
+    #security_groups:         "{{ master_role }}-public-secgroup"
 
 - name: enforce router node to masquerade private node traffic
   when:                       inventory_hostname == router_host

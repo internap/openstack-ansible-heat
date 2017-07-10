@@ -1,11 +1,17 @@
 #node counting and balancing
-node_number:                    "{{ node_count                          | default( 2 ) }}"
-public_node_number:             "{{ ( public_node_count is defined )    | ternary( public_node_count,   ( private_node_count is defined ) | ternary( ( node_number | int ) - ( private_node_count | int ), node_number ) ) }}"
-private_node_number:            "{{ ( private_node_count is defined )   | ternary( private_node_count,  ( node_number | int ) - ( public_node_number | int ) ) }}"
+node_number:                    "{{ node_count                          | default( ( ( public_node_count | default( 1 ) ) | int ) + ( ( private_node_count | default( 0 ) ) | int ) ) }}"
+public_node_number:             "{{ public_node_count                   | default( ( node_number | int ) - ( ( private_node_count | default( 0 ) ) | int ) ) }}"
+private_node_number:            "{{ private_node_count                  | default( ( node_number | int ) - ( ( ( public_node_number > 0 ) | ternary( public_node_number, 1 ) ) | int ) ) }}"
 
-os_docker_registry_idx:         "{{ ( private_node_number > 0 ) | ternary( ( private_node_number | int ) - 1, ( public_node_number | int ) - 1 ) }}"
-os_docker_registry:             "{{ ( private_node_number > 0 ) | ternary( groups[ 'private_nodes' ][ os_docker_registry_idx | int ], groups[ 'public_nodes' ][ os_docker_registry_idx | int ] ) }}"
+#if there's private node, we default on selecting the last private node as the registry
+os_docker_registry_exposition:  "{{ ( ( ( groups[ master_role + '-private_nodes' ] | default( [] ) ) | length ) > 0 ) | ternary( master_role + '-private_nodes', master_role + '-public_nodes' ) }}"
+os_docker_registry_idx:         "{{ ( ( groups[ os_docker_registry_exposition ] | default( [ ] ) ) | length ) - 1 }}"
+os_docker_registry:             "{{ ( groups[ os_docker_registry_exposition ] | default( [ ] ) ) [ os_docker_registry_idx | int ] }}"
 
+#groups[ master_role + '-private_nodes' ][ os_docker_registry_idx | int ]
 certs_directory:                "/opt/certs/"
 registry_private_port:          5000
 registry_public_port:           443
+
+#parameter passing for meta roles
+os_docker_registry_dnsnames:    "{{ docker_registry_dnsnames | default( [ 'docker.local', 'docker.prod' ] ) }}"

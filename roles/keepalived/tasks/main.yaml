@@ -5,8 +5,8 @@
     file:                         roles/inventory/defaults/main.yaml
 
 - name: we've choosen the instance
-  run_once:                             true
-  debug:                                msg="{{ virtualrouter_id }} to be Virtual Router"
+  run_once:                       true
+  debug:                          msg="{{ virtualrouter_id }} to be Virtual Router"
 
 - name: build ip pairs array
   set_fact:
@@ -21,10 +21,10 @@
   connection:                     local
   os_port:
     cloud:                        "{{ os_cloud_name }}"
-    name:                         "{{ playbook_name }}-keepalived-port"
+    name:                         "{{ master_role }}-keepalived-port"
     network:                      "{{ os_cloud_publicnetwork_name }}"
     allowed_address_pairs:        "{{ ippairs }}"
-    security_groups:              "{{ playbook_name }}-public-secgroup"
+    security_groups:              "{{ master_role }}-public-secgroup"
   with_items:                     "{{ groups[ 'public_nodes' ] }}"
 
 - name: gather the Keepalived neutron port facts
@@ -33,7 +33,7 @@
   os_port_facts:
     cloud:                        "{{ os_cloud_name }}"
     filters:
-      name:                       "{{ playbook_name }}-keepalived-port"
+      name:                       "{{ master_role }}-keepalived-port"
 
 - name: store Keepalived port IP address for virtual routeur
   run_once:                       true

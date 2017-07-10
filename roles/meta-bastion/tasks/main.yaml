@@ -29,7 +29,7 @@
   with_items:                 bastion_host
   blockinfile:
     create:                   yes
-    dest:                     "./config/data/{{ playbook_name }}-ssh_config"
+    dest:                     "./config/data/{{ master_role }}-ssh_config"
     marker:                   "#{mark} BASTION"
     block: |
                               Host {{ bastion_host_publicip }}
@@ -48,7 +48,7 @@
   with_items:                 "{{ groups[ 'private_nodes' ] }}"
   blockinfile:
     create:                   yes
-    dest:                     "./config/data/{{ playbook_name }}-ssh_config"
+    dest:                     "./config/data/{{ master_role }}-ssh_config"
     marker:                   "#{mark} FORDARDED INSTANCE {{ item }}"
     block: |
                               Host {{ hostvars[ item ].privateIPv4 }}

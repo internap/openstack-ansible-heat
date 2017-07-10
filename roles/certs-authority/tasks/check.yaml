@@ -13,11 +13,11 @@
   copy:
     directory_mode:   0755
     src:              "{{ ca_privatekey_filepath }}"
-    dest:             "{{ certs_directory }}{{ playbook_name }}-CA.privatekey.key"
+    dest:             "{{ certs_directory }}{{ master_role }}-CA.privatekey.key"
 
 - name: CA check -- checking if the Certificate Authority private key exists on the server
   stat:
-    path:             "{{ certs_directory }}{{ playbook_name }}-CA.privatekey.key"
+    path:             "{{ certs_directory }}{{ master_role }}-CA.privatekey.key"
   register:           ca_privatekey_exist
 
 - fail:               msg="The CA private key is not present on this node or not passed as parameter ca_privatekey_filepath"
@@ -29,11 +29,11 @@
   copy:
     directory_mode:   0755
     src:              "{{ ca_publickey_filepath }}"
-    dest:             "{{ certs_directory }}{{ playbook_name }}-CA.publickey.crt"
+    dest:             "{{ certs_directory }}{{ master_role }}-CA.publickey.crt"
 
 - name: CA check -- checking if the Certificate Authority public key exists on the server
   stat:
-    path:             "{{ certs_directory }}{{ playbook_name }}-CA.publickey.crt"
+    path:             "{{ certs_directory }}{{ master_role }}-CA.publickey.crt"
   register:           ca_publickey_exist
 
 - fail:               msg="The CA public key is not present on this node or not passed as parameter ca_privatekey_filepath"

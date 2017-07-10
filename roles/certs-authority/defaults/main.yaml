@@ -6,3 +6,5 @@ private_node_number:            "{{ ( private_node_count is defined )   | ternar
 #other default
 certs_directory:                "/opt/certs/"
 key_size:                       4096
+
+server_dnsnames:                "{{ [ 'server.local', 'server.prod' ] }}"

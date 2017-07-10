@@ -13,8 +13,8 @@ registry:
   ports:
   - "5000:5000"
   env:
-    REGISTRY_HTTP_TLS_CERTIFICATE:    "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.crt"
-    REGISTRY_HTTP_TLS_KEY:            "{{ certs_directory }}{{ playbook_name }}-{{ inventory_hostname }}.key"
+    REGISTRY_HTTP_TLS_CERTIFICATE:    "{{ certs_directory }}{{ master_role }}-{{ inventory_hostname }}.crt"
+    REGISTRY_HTTP_TLS_KEY:            "{{ certs_directory }}{{ master_role }}-{{ inventory_hostname }}.key"
     REGISTRY_STORAGE:                 swift
     REGISTRY_STORAGE_SWIFT_USERNAME:  "{{ os_auth_params.username }}"
     REGISTRY_STORAGE_SWIFT_PASSWORD:  "{{ os_auth_params.password }}"
@@ -22,7 +22,7 @@ registry:
     REGISTRY_STORAGE_SWIFT_TENANT:    "{{ os_auth_params.project_name }}"
     REGISTRY_STORAGE_SWIFT_DOMAIN:    "{{ os_auth_params.project_domain_name }}"
     REGISTRY_STORAGE_SWIFT_REGION:    "{{ os_auth_region_name }}"
-    REGISTRY_STORAGE_SWIFT_CONTAINER: "{{ playbook_name }}"
+    REGISTRY_STORAGE_SWIFT_CONTAINER: "{{ master_role }}"
     REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY: yes
   maintenance:
     uploadpurging:
