@@ -70,3 +70,10 @@
   file:
     path:                   "{{ ansible_ssh_private_key_file }}.pub"
     state:                  absent
+
+- name: include role clean up tasks if they exists
+  include:                  "roles/{{ role }}/tasks/cleanup.yaml"
+  with_first_found:
+    - files:
+      - "roles/{{ role }}/tasks/cleanup.yaml"
+      skip: true
